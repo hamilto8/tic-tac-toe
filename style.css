@@ -1,0 +1,20 @@
+html, body{
+    padding: none;
+    margin: 0;
+}
+
+#main {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 800;
+    font-size: 35px;
+}
+
+#main p{
+    text-align: center;
+}
+
+#main p:hover{
+    background-color: rgb(255, 230, 0);
+}
