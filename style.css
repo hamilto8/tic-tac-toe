@@ -13,8 +13,18 @@ html, body{
 
 #main p{
     text-align: center;
+    user-select: none;
 }
 
 #main p:hover{
-    background-color: rgb(255, 230, 0);
+    background-color: rgb(255, 246, 163);
+}
+
+#main p:active {
+    background-color: rgb(166, 255, 0);
+}
+
+.header {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
 }

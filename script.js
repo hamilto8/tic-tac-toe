@@ -1,7 +1,4 @@
 const main = document.querySelector('#main');
-const generator = document.querySelector("#generator");
-
-generator.addEventListener('click', generate);
 
 let gameBoard = {
     board: [['x'],['o'],['x'],
