@@ -1,4 +1,4 @@
-html, body{
+*, html, body{
     padding: none;
     margin: 0;
 }
@@ -14,6 +14,8 @@ html, body{
 #main p{
     text-align: center;
     user-select: none;
+    padding: 50px;
+    border: 1px black solid;
 }
 
 #main p:hover{
@@ -27,4 +29,25 @@ html, body{
 .header {
     font-family: 'Courier New', Courier, monospace;
     text-align: center;
+    margin: 0 auto;
+    background-color: red;
+    padding: none;
+}
+
+.makeChoice {
+    padding: 10px;
+    text-align: center;
+}
+
+button {
+    border-radius: 5px;
+    background-color: #fff;
+    border: 2px solid black;
+    padding: 5px;
+    margin: 5px;
+   transition: all .25s;
+}
+
+button:hover {
+    background-color:rgb(255, 194, 124);
 }
