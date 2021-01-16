@@ -3,6 +3,7 @@ const chooseX = document.querySelector('.chooseX');
 const chooseO = document.querySelector('.chooseO');
 const choiceDiv = document.querySelector('.makeChoice');
 const squares = document.querySelectorAll('.square');
+const soundButton = document.querySelector('.sound');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
@@ -13,9 +14,11 @@ let chosenChar;
 let computerChar;
 let start = false;
 let gameOver = false;
+let playSound = true;
 
 chooseX.addEventListener('click', makeChoiceX);
 chooseO.addEventListener('click', makeChoiceO);
+soundButton.addEventListener('click', changeSoundSetting);
 
 
 let gameBoard = {
@@ -48,7 +51,9 @@ let markSquare = ((idx)=>{
         if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar){
             // flashRed();
         } else {
-            playerSound.play();
+            if(playSound){
+                playerSound.play();
+            }
             gameBoard.board[idx] = chosenChar;
         }
         main.innerHTML = '';
@@ -59,7 +64,9 @@ let markSquare = ((idx)=>{
         } else {
             setTimeout(() => {
                 if(start){
-                    computerSound.play();
+                    if(playSound){
+                        computerSound.play();
+                    }
                     computerChoice();
                     main.innerHTML = '';
                     displayBoard();        
@@ -129,7 +136,9 @@ function checkWin(){
 
 function displayBoard(){
     if(gameOver){
-        gameLostSound.play();
+        if(playSound){
+            gameLostSound.play();
+        }
         main.innerHTML += `
             <div class='gameOver'>
                 <h3>Game Over :(</h3>
@@ -144,7 +153,9 @@ function displayBoard(){
             `;
             main.innerHTML += el;
         });
-        gameWinSound.play();
+        if(playSound){
+            gameWinSound.play();
+        }
         main.innerHTML += `<div class='gameWon'> 
         <h3>
         
@@ -159,6 +170,16 @@ function displayBoard(){
             main.innerHTML += el;
         });
         
+    }
+}
+
+function changeSoundSetting(){
+    if (soundButton.innerHTML === `<i class="fas fa-volume-up"></i>`){
+        playSound = false;
+        soundButton.innerHTML = `<i class="fas fa-volume-mute"></i>`;
+    } else {
+        playSound = true;
+        soundButton.innerHTML = `<i class="fas fa-volume-up"></i>`;
     }
 }
 
