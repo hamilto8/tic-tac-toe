@@ -4,6 +4,11 @@ const chooseO = document.querySelector('.chooseO');
 const choiceDiv = document.querySelector('.makeChoice');
 const squares = document.querySelectorAll('.square');
 
+const playerSound = new Audio('./sound/light-beep.mp3');
+const computerSound = new Audio('./sound/low-beep.mp3');
+const gameWinSound = new Audio('./sound/success.mp3');
+const gameLostSound = new Audio('./sound/failure.mp3');
+
 let chosenChar;
 let computerChar;
 let start = false;
@@ -36,28 +41,30 @@ let markSquare = ((idx)=>{
     if(chosenChar !== 'x' && chosenChar !== 'o'){
         alert('please choose a letter');
     } else if(!gameBoard.board.some(fullBoard)){
-         alert('Game Over');
          gameOver = true;
+         displayBoard();
     } else {
         start = true;
         if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar){
-            flashRed();;
+            // flashRed();
         } else {
+            playerSound.play();
             gameBoard.board[idx] = chosenChar;
         }
         main.innerHTML = '';
         displayBoard();
         if(checkWin()){
-            console.log("You Won");
+            // console.log("You Won");
             gameOver = true;
         } else {
             setTimeout(() => {
                 if(start){
+                    computerSound.play();
                     computerChoice();
                     main.innerHTML = '';
                     displayBoard();        
                 }
-            }, 500);
+            }, 900);
         }
     }
 });
@@ -76,12 +83,11 @@ function computerChoice(){
     if(gameBoard.board[idx] !== 'x' && gameBoard.board[idx] !== 'o'){
         gameBoard.board[idx] = computerChar;
     } else if(!gameBoard.board.some(fullBoard)){
-        alert('Game Over');
         gameOver = true;
+        displayBoard();
     } else {
         computerChoice();
     }
-
 }
 
 let displayController = {
@@ -122,6 +128,14 @@ function checkWin(){
 }
 
 function displayBoard(){
+    if(gameOver){
+        gameLostSound.play();
+        main.innerHTML += `
+            <div class='gameOver'>
+                <h3>Game Over :(</h3>
+            </div>
+        `;
+    }
     if(checkWin()){
         clearInterval(markSquare);
         gameBoard.board.forEach((char, idx)=>{
@@ -130,6 +144,7 @@ function displayBoard(){
             `;
             main.innerHTML += el;
         });
+        gameWinSound.play();
         main.innerHTML += `<div class='gameWon'> 
         <h3>
         
