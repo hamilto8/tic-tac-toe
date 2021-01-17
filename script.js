@@ -35,6 +35,7 @@ function restartGame(){
     gameBoard.board = [[],[],[],[],[],[],[],[],[]];
     chosenChar = undefined;
     computerChar = undefined;
+    playerTurn = undefined;
     main.innerHTML = '';
     gameOver = false;
     start = false;
