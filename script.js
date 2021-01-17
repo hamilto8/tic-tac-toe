@@ -5,11 +5,14 @@ const choiceDiv = document.querySelector('.makeChoice');
 const squares = document.querySelectorAll('.square');
 const soundButton = document.querySelector('.sound');
 const playAgainButton = document.querySelector('.playAgain');
+const chooseCharDiv = document.querySelector('.chooseChar');
+const okayButton = document.querySelector('.okayButton');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
 const gameWinSound = new Audio('./sound/success.mp3');
 const gameLostSound = new Audio('./sound/failure.mp3');
+const alertSound = new Audio('./sound/alert.mp3');
 
 let chosenChar;
 let computerChar;
@@ -22,6 +25,7 @@ chooseX.addEventListener('click', makeChoiceX);
 chooseO.addEventListener('click', makeChoiceO);
 soundButton.addEventListener('click', changeSoundSetting);
 playAgainButton.addEventListener('click', restartGame);
+okayButton.addEventListener('click', confirmNoChar);
 
 
 let gameBoard = {
@@ -29,6 +33,10 @@ let gameBoard = {
             [],[],[],
             [],[],[]]
 };
+
+function confirmNoChar(){
+    chooseCharDiv.style.display = 'none';
+}
 
 function restartGame(){
     playAgainButton.style.display = 'none';
@@ -59,7 +67,10 @@ function makeChoiceO(){
 
 let markSquare = ((idx)=>{
     if(chosenChar !== 'x' && chosenChar !== 'o'){
-        alert('please choose a letter');
+        if(playSound){
+            alertSound.play();
+        }
+        chooseCharDiv.style.display = 'flex';
     } else if(!gameBoard.board.some(fullBoard)){
          gameOver = true;
          displayBoard();
