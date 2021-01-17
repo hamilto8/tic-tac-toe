@@ -4,6 +4,7 @@ const chooseO = document.querySelector('.chooseO');
 const choiceDiv = document.querySelector('.makeChoice');
 const squares = document.querySelectorAll('.square');
 const soundButton = document.querySelector('.sound');
+const playAgainButton = document.querySelector('.playAgain');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
@@ -14,11 +15,13 @@ let chosenChar;
 let computerChar;
 let start = false;
 let gameOver = false;
+let playerTurn;
 let playSound = true;
 
 chooseX.addEventListener('click', makeChoiceX);
 chooseO.addEventListener('click', makeChoiceO);
 soundButton.addEventListener('click', changeSoundSetting);
+playAgainButton.addEventListener('click', restartGame);
 
 
 let gameBoard = {
@@ -27,16 +30,29 @@ let gameBoard = {
             [],[],[]]
 };
 
+function restartGame(){
+    playAgainButton.style.display = 'none';
+    gameBoard.board = [[],[],[],[],[],[],[],[],[]];
+    chosenChar = undefined;
+    computerChar = undefined;
+    main.innerHTML = '';
+    gameOver = false;
+    start = false;
+    choiceDiv.style.display = 'flex';
+    displayBoard();
+}
 
 function makeChoiceX(){
     chosenChar = 'x';
     computerChar = 'o';
+    playerTurn = true;
     choiceDiv.style.display = 'none';
 }
 
 function makeChoiceO(){
     chosenChar = 'o';
     computerChar = 'x';
+    playerTurn = true;
     choiceDiv.style.display = 'none';
 }
 
@@ -50,16 +66,17 @@ let markSquare = ((idx)=>{
         start = true;
         if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar){
             // flashRed();
-        } else {
+        } else { if(playerTurn){
             if(playSound){
                 playerSound.play();
             }
             gameBoard.board[idx] = chosenChar;
+            playerTurn = false;
+        }
         }
         main.innerHTML = '';
         displayBoard();
         if(checkWin()){
-            // console.log("You Won");
             gameOver = true;
         } else {
             setTimeout(() => {
@@ -89,6 +106,7 @@ function computerChoice(){
     let idx = Math.floor(Math.random() * gameBoard.board.length);
     if(gameBoard.board[idx] !== 'x' && gameBoard.board[idx] !== 'o'){
         gameBoard.board[idx] = computerChar;
+        playerTurn = true;
     } else if(!gameBoard.board.some(fullBoard)){
         gameOver = true;
         displayBoard();
@@ -97,9 +115,9 @@ function computerChoice(){
     }
 }
 
-let displayController = {
+// let displayController = {
 
-};
+// };
 
 function checkWin(){
     let won = false;
@@ -107,7 +125,7 @@ function checkWin(){
 
     if(gameBoard.board[0] === chosenChar && gameBoard.board[1] === chosenChar && gameBoard.board[2] === chosenChar){
         won = true;
-    } else if (gameBoard.board[0] === computerChar && gameBoard[1] === computerChar && gameBoard.board[2] === computerChar) {
+    } else if (gameBoard.board[0] === computerChar && gameBoard.board[1] === computerChar && gameBoard.board[2] === computerChar) {
         won = true;
     } else if (gameBoard.board[3] === chosenChar && gameBoard.board[4] === chosenChar && gameBoard.board[5] === chosenChar){
         won = true;
@@ -119,11 +137,11 @@ function checkWin(){
         won = true;
     } else if (gameBoard.board[0] === chosenChar && gameBoard.board[3] === chosenChar && gameBoard.board[6] === chosenChar){
         won = true;
-    } else if (gameBoard.board[0] === computerChar && gameBoard.board[3] === computerChar && gameBoard.board[7] === computerChar){
+    } else if (gameBoard.board[0] === computerChar && gameBoard.board[3] === computerChar && gameBoard.board[6] === computerChar){
         won = true;
     } else if (gameBoard.board[1] === chosenChar && gameBoard.board[4] === chosenChar && gameBoard.board[7] === chosenChar){
         won = true;
-    } else if (gameBoard.board[1] === computerChar && gameBoard.board[4] === computerChar && gameBoard.board[7 === computerChar]){
+    } else if (gameBoard.board[1] === computerChar && gameBoard.board[4] === computerChar && gameBoard.board[7] === computerChar){
         won = true;
     } else if (gameBoard.board[2] === chosenChar && gameBoard.board[5] === chosenChar && gameBoard.board[8] === chosenChar){
         won = true;
@@ -144,6 +162,7 @@ function displayBoard(){
                 <h3>Game Over :(</h3>
             </div>
         `;
+        playAgainButton.style.display = 'flex';
     }
     if(checkWin()){
         clearInterval(markSquare);
@@ -158,10 +177,10 @@ function displayBoard(){
         }
         main.innerHTML += `<div class='gameWon'> 
         <h3>
-        
         The Game is Won 
         </h3>
         </div>`;
+        playAgainButton.style.display = 'flex';
     } else {
         gameBoard.board.forEach((char, idx)=>{
             let el = `
