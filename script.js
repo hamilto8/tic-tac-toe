@@ -8,6 +8,8 @@ const playAgainButton = document.querySelector('.playAgain');
 const chooseCharDiv = document.querySelector('.chooseChar');
 const okayButton = document.querySelector('.okayButton');
 const takenSquareDiv = document.querySelector('.takenSquare');
+const gameWonNotice = document.querySelector('.gameWon');
+const gameOverNotice = document.querySelector('.gameOver');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
@@ -42,6 +44,8 @@ function confirmNoChar(){
 
 function restartGame(){
     playAgainButton.style.display = 'none';
+    gameWonNotice.style.display = 'none';
+    gameOverNotice.style.display = 'none';
     gameBoard.board = [[],[],[],[],[],[],[],[],[]];
     chosenChar = undefined;
     computerChar = undefined;
@@ -112,7 +116,9 @@ let markSquare = ((idx)=>{
 
 function takenNotice(){
    takenSquareDiv.style.display = 'flex';
-   wrongSquareAlarm.play();
+   if(playSound){
+       wrongSquareAlarm.play();
+   }
    setTimeout(() => {
        takenSquareDiv.style.display = 'none';
    }, 800);
@@ -178,12 +184,8 @@ function displayBoard(){
         if(playSound){
             gameLostSound.play();
         }
-        main.innerHTML += `
-            <div class='gameOver'>
-                <h3>Game Over :(</h3>
-            </div>
-        `;
         playAgainButton.style.display = 'flex';
+        gameOverNotice.style.display = 'flex';
     }
     if(checkWin()){
         clearInterval(markSquare);
@@ -196,12 +198,9 @@ function displayBoard(){
         if(playSound){
             gameWinSound.play();
         }
-        main.innerHTML += `<div class='gameWon'> 
-        <h3>
-        The Game is Won 
-        </h3>
-        </div>`;
-        playAgainButton.style.display = 'flex';
+        playAgainButton.style.display = 'block';
+        gameWonNotice.style.display = 'flex';
+        
     } else {
         gameBoard.board.forEach((char, idx)=>{
             let el = `
