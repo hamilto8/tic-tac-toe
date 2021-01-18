@@ -7,12 +7,14 @@ const soundButton = document.querySelector('.sound');
 const playAgainButton = document.querySelector('.playAgain');
 const chooseCharDiv = document.querySelector('.chooseChar');
 const okayButton = document.querySelector('.okayButton');
+const takenSquareDiv = document.querySelector('.takenSquare');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
 const gameWinSound = new Audio('./sound/success.mp3');
 const gameLostSound = new Audio('./sound/failure.mp3');
 const alertSound = new Audio('./sound/alert.mp3');
+const wrongSquareAlarm = new Audio('./sound/wrong.mp3');
 
 let chosenChar;
 let computerChar;
@@ -77,7 +79,8 @@ let markSquare = ((idx)=>{
     } else {
         start = true;
         if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar){
-            // flashRed();
+            takenNotice(idx);
+            playerTurn = true;
         } else { if(playerTurn){
             if(playSound){
                 playerSound.play();
@@ -91,22 +94,28 @@ let markSquare = ((idx)=>{
         if(checkWin()){
             gameOver = true;
         } else {
-            setTimeout(() => {
-                if(start){
-                    if(playSound){
-                        computerSound.play();
+            if(!playerTurn){
+                setTimeout(() => {
+                    if(start){
+                        if(playSound){
+                            computerSound.play();
+                        }
+                        computerChoice();
+                        main.innerHTML = '';
+                        displayBoard();        
                     }
-                    computerChoice();
-                    main.innerHTML = '';
-                    displayBoard();        
-                }
-            }, 900);
+                }, 900);
+            }
         }
     }
 });
 
-function flashRed(){
-    console.log('taken');
+function takenNotice(){
+   takenSquareDiv.style.display = 'flex';
+   wrongSquareAlarm.play();
+   setTimeout(() => {
+       takenSquareDiv.style.display = 'none';
+   }, 800);
 }
 
 function fullBoard(el){
