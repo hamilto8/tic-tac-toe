@@ -10,26 +10,37 @@ const okayButton = document.querySelector('.okayButton');
 const takenSquareDiv = document.querySelector('.takenSquare');
 const gameWonNotice = document.querySelector('.gameWon');
 const gameOverNotice = document.querySelector('.gameOver');
+const chooseGameStyle = document.querySelector('.choose-player-count');
+const chooseOnePlayer = document.querySelector('.one-player');
+const chooseTwoPlayer = document.querySelector('.two-player');
+const playerStatus = document.querySelector('.player-status');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
 const gameWinSound = new Audio('./sound/success.mp3');
 const gameLostSound = new Audio('./sound/failure.mp3');
-const alertSound = new Audio('./sound/alert.mp3');
 const wrongSquareAlarm = new Audio('./sound/wrong.mp3');
 
 let chosenChar;
+let playerTwoChar;
 let computerChar;
+
 let start = false;
+let twoPlayer;
 let gameOver = false;
 let playerTurn;
+let playerTwoTurn;
 let playSound = true;
 
-chooseX.addEventListener('click', makeChoiceX);
-chooseO.addEventListener('click', makeChoiceO);
 soundButton.addEventListener('click', changeSoundSetting);
 playAgainButton.addEventListener('click', restartGame);
 okayButton.addEventListener('click', confirmNoChar);
+
+chooseOnePlayer.addEventListener('click', setOnePlayerGame);
+chooseTwoPlayer.addEventListener('click', setTwoPlayerGame);
+
+chooseX.addEventListener('click', makeChoiceX);
+chooseO.addEventListener('click', makeChoiceO);
 
 
 let gameBoard = {
@@ -38,67 +49,131 @@ let gameBoard = {
             [],[],[]]
 };
 
+
+function setOnePlayerGame(){
+    chooseGameStyle.style.display = 'none';
+    choiceDiv.style.display = 'flex';
+    twoPlayer = false;
+}
+
+function setTwoPlayerGame(){
+    chooseGameStyle.style.display = 'none';
+    choiceDiv.style.display = 'flex';
+    twoPlayer = true;
+}
+
+function switchPlayers(){
+    playerStatus.innerHTML = '';
+    if(playerTurn && !playerTwoTurn){
+        playerStatus.innerHTML += `
+        <h3>Player 1 Turn</h3>
+        `;
+        if(twoPlayer){
+            playerTwoTurn = true;
+            
+        }
+    } else if (playerTwoTurn) {
+        playerStatus.innerHTML += `
+        <h3>Player 2 Turn</h3>
+        `;
+        playerTwoTurn = false;
+    } else {
+        playerStatus.innerHTML += `
+        <h3>Computer Turn</h3>
+        `;
+    }
+    if(!gameBoard.board.some(fullBoard)){
+        gameOver = true;
+        main.innerHTML = '';
+        displayBoard();
+    }
+}
+
 function confirmNoChar(){
     chooseCharDiv.style.display = 'none';
+    chooseCharDiv.style.opacity = '0';
+    chooseGameStyle.style.display = 'block';
 }
 
 function restartGame(){
     playAgainButton.style.display = 'none';
     gameWonNotice.style.display = 'none';
     gameOverNotice.style.display = 'none';
+    chooseGameStyle.style.display = 'block';
+    playerStatus.innerHTML = '';
     gameBoard.board = [[],[],[],[],[],[],[],[],[]];
     chosenChar = undefined;
     computerChar = undefined;
     playerTurn = undefined;
+    twoPlayer = undefined;
     main.innerHTML = '';
     gameOver = false;
     start = false;
-    choiceDiv.style.display = 'flex';
     displayBoard();
 }
 
 function makeChoiceX(){
     chosenChar = 'x';
-    computerChar = 'o';
+    if(twoPlayer){
+        playerTwoChar = 'o';
+    } else {
+        computerChar = 'o';
+    }
     playerTurn = true;
+    switchPlayers();
     choiceDiv.style.display = 'none';
 }
 
 function makeChoiceO(){
     chosenChar = 'o';
-    computerChar = 'x';
+    if(twoPlayer){
+        playerTwoChar = 'x';
+    } else {
+        computerChar = 'x';
+    }
     playerTurn = true;
+    switchPlayers();
     choiceDiv.style.display = 'none';
 }
 
 let markSquare = ((idx)=>{
     if(chosenChar !== 'x' && chosenChar !== 'o'){
         if(playSound){
-            alertSound.play();
+            wrongSquareAlarm.play();
         }
         chooseCharDiv.style.display = 'flex';
+        chooseCharDiv.style.opacity = '.9';
+        chooseGameStyle.style.display = 'none';
+        choiceDiv.style.display = 'none';
     } else if(!gameBoard.board.some(fullBoard)){
          gameOver = true;
          displayBoard();
     } else {
         start = true;
+        playerStatus.style.display = 'flex';
         if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar){
             takenNotice(idx);
             playerTurn = true;
         } else { if(playerTurn){
+            playerTurn = false;
+            
             if(playSound){
                 playerSound.play();
             }
             gameBoard.board[idx] = chosenChar;
-            playerTurn = false;
+            if(twoPlayer){
+                gameBoard[idx] = playerTwoChar;
+            }
         }
+
         }
         main.innerHTML = '';
         displayBoard();
         if(checkWin()){
             gameOver = true;
         } else {
-            if(!playerTurn){
+            if(!playerTurn && !twoPlayer){
+                switchPlayers();
                 setTimeout(() => {
                     if(start){
                         if(playSound){
@@ -106,9 +181,13 @@ let markSquare = ((idx)=>{
                         }
                         computerChoice();
                         main.innerHTML = '';
-                        displayBoard();        
+                        displayBoard();      
                     }
                 }, 900);
+            } else if (twoPlayer){
+                playerTurn = true;
+                // playerTwoTurn = true;
+                switchPlayers();
             }
         }
     }
@@ -129,7 +208,6 @@ function fullBoard(el){
 }
 
 function computerChoice(){
-
     let idx = Math.floor(Math.random() * gameBoard.board.length);
     if(gameBoard.board[idx] !== 'x' && gameBoard.board[idx] !== 'o'){
         gameBoard.board[idx] = computerChar;
@@ -140,6 +218,7 @@ function computerChoice(){
     } else {
         computerChoice();
     }
+    switchPlayers();
 }
 
 // let displayController = {
@@ -148,7 +227,6 @@ function computerChoice(){
 
 function checkWin(){
     let won = false;
-    let computerWon = 'computer';
 
     if(gameBoard.board[0] === chosenChar && gameBoard.board[1] === chosenChar && gameBoard.board[2] === chosenChar){
         won = true;
@@ -176,7 +254,6 @@ function checkWin(){
         won = true;
     }
     return won;
-//    clearInterval(markSquare)
 }
 
 function displayBoard(){
@@ -191,7 +268,7 @@ function displayBoard(){
         clearInterval(markSquare);
         gameBoard.board.forEach((char, idx)=>{
             let el = `
-                <p data-index=${idx} onclick="markSquare(${idx})">${char}</p>
+                <h3 data-index=${idx} onclick="markSquare(${idx})">${char}</h3>
             `;
             main.innerHTML += el;
         });
