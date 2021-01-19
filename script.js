@@ -26,10 +26,10 @@ let playerTwoChar;
 let computerChar;
 
 let start = false;
-let twoPlayer;
+let twoPlayer = false;
 let gameOver = false;
 let playerTurn;
-let playerTwoTurn;
+let playerTwoTurn = false;
 let playSound = true;
 
 soundButton.addEventListener('click', changeSoundSetting);
@@ -70,7 +70,6 @@ function switchPlayers(){
         `;
         if(twoPlayer){
             playerTwoTurn = true;
-            
         }
     } else if (playerTwoTurn) {
         playerStatus.innerHTML += `
@@ -103,9 +102,11 @@ function restartGame(){
     playerStatus.innerHTML = '';
     gameBoard.board = [[],[],[],[],[],[],[],[],[]];
     chosenChar = undefined;
+    playerTwoChar = undefined;
     computerChar = undefined;
     playerTurn = undefined;
     twoPlayer = undefined;
+    playerTwoTurn = false;
     main.innerHTML = '';
     gameOver = false;
     start = false;
@@ -160,10 +161,16 @@ let markSquare = ((idx)=>{
             if(playSound){
                 playerSound.play();
             }
-            gameBoard.board[idx] = chosenChar;
             if(twoPlayer){
-                gameBoard[idx] = playerTwoChar;
+                if(!playerTwoTurn){
+                    gameBoard.board[idx] = playerTwoChar
+                } else {
+                    gameBoard.board[idx] = chosenChar;
+                }
+            } else {
+                gameBoard.board[idx] = chosenChar;
             }
+            
         }
 
         }
@@ -186,7 +193,6 @@ let markSquare = ((idx)=>{
                 }, 900);
             } else if (twoPlayer){
                 playerTurn = true;
-                // playerTwoTurn = true;
                 switchPlayers();
             }
         }
@@ -227,32 +233,20 @@ function computerChoice(){
 
 function checkWin(){
     let won = false;
-
-    if(gameBoard.board[0] === chosenChar && gameBoard.board[1] === chosenChar && gameBoard.board[2] === chosenChar){
+    
+    if(gameBoard.board[0] === gameBoard.board[1] && gameBoard.board[1] === gameBoard.board[2]){
         won = true;
-    } else if (gameBoard.board[0] === computerChar && gameBoard.board[1] === computerChar && gameBoard.board[2] === computerChar) {
+    }  else if (gameBoard.board[3] === gameBoard.board[4] && gameBoard.board[4] === gameBoard.board[5]){
         won = true;
-    } else if (gameBoard.board[3] === chosenChar && gameBoard.board[4] === chosenChar && gameBoard.board[5] === chosenChar){
+    } else if (gameBoard.board[6] === gameBoard.board[7] && gameBoard.board[7] === gameBoard.board[8]){
         won = true;
-    } else if (gameBoard.board[3] === computerChar && gameBoard.board[4] === computerChar && gameBoard.board[5] === computerChar){
+    } else if (gameBoard.board[0] === gameBoard.board[3] && gameBoard.board[3] === gameBoard.board[6]){
         won = true;
-    } else if (gameBoard.board[6] === chosenChar && gameBoard.board[7] === chosenChar && gameBoard.board[8] === chosenChar){
+    } else if (gameBoard.board[1] === gameBoard.board[4] && gameBoard.board[4] === gameBoard.board[7]){
         won = true;
-    } else if (gameBoard.board[6] === computerChar && gameBoard.board[7] === computerChar && gameBoard.board[8] === computerChar){
+    } else if (gameBoard.board[2] === gameBoard.board[5] && gameBoard.board[5] === gameBoard.board[8]){
         won = true;
-    } else if (gameBoard.board[0] === chosenChar && gameBoard.board[3] === chosenChar && gameBoard.board[6] === chosenChar){
-        won = true;
-    } else if (gameBoard.board[0] === computerChar && gameBoard.board[3] === computerChar && gameBoard.board[6] === computerChar){
-        won = true;
-    } else if (gameBoard.board[1] === chosenChar && gameBoard.board[4] === chosenChar && gameBoard.board[7] === chosenChar){
-        won = true;
-    } else if (gameBoard.board[1] === computerChar && gameBoard.board[4] === computerChar && gameBoard.board[7] === computerChar){
-        won = true;
-    } else if (gameBoard.board[2] === chosenChar && gameBoard.board[5] === chosenChar && gameBoard.board[8] === chosenChar){
-        won = true;
-    } else if (gameBoard.board[2] === computerChar && gameBoard.board[5] === computerChar && gameBoard.board[8] === computerChar){
-        won = true;
-    }
+    } 
     return won;
 }
 
