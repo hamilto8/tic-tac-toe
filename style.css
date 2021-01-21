@@ -16,7 +16,7 @@ body {
 
 #main {
     border-radius: .3em;
-    display: grid;
+    display: none;
     position: relative;
     grid-template-columns: repeat(3, 1fr);
     font-family: 'Courier New', Courier, monospace;
@@ -46,6 +46,8 @@ body {
     top: 0;
     right: 0;
     left: 0;
+    font-family: 'Londrina Outline', cursive;
+    font-weight: 700;
 
 }
 
@@ -203,6 +205,15 @@ button:hover {
     position: absolute;
 }
 
+.options {
+    display: block;
+    margin: 0 auto;
+    padding: 15px;
+    height: 100px;
+    background-color: rgb(189, 189, 189);
+    border:  2px solid black;
+}
+
 .choose-player-count  {
     display: block;
     text-align: center;
@@ -222,4 +233,8 @@ button:hover {
     text-align: center;
     justify-content: center;
     align-items: center;
+}
+
+#tic-tac-logo:hover {
+    cursor: pointer;
 }

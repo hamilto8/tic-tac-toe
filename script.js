@@ -14,6 +14,8 @@ const chooseGameStyle = document.querySelector('.choose-player-count');
 const chooseOnePlayer = document.querySelector('.one-player');
 const chooseTwoPlayer = document.querySelector('.two-player');
 const playerStatus = document.querySelector('.player-status');
+const tictacLogo = document.querySelector('#tic-tac-logo');
+const optionsDiv = document.querySelector('.options');
 
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
@@ -49,6 +51,7 @@ let gameBoard = {
             [],[],[]]
 };
 
+tictacLogo.addEventListener('click', restartGame);
 
 function setOnePlayerGame(){
     chooseGameStyle.style.display = 'none';
@@ -99,6 +102,8 @@ function restartGame(){
     gameWonNotice.style.display = 'none';
     gameOverNotice.style.display = 'none';
     chooseGameStyle.style.display = 'block';
+    optionsDiv.style.display = 'block';
+    main.style.display = 'none';
     playerStatus.innerHTML = '';
     gameBoard.board = [[],[],[],[],[],[],[],[],[]];
     chosenChar = undefined;
@@ -123,6 +128,8 @@ function makeChoiceX(){
     playerTurn = true;
     switchPlayers();
     choiceDiv.style.display = 'none';
+    optionsDiv.style.display = 'none';
+    main.style.display = 'grid';
 }
 
 function makeChoiceO(){
@@ -135,6 +142,8 @@ function makeChoiceO(){
     playerTurn = true;
     switchPlayers();
     choiceDiv.style.display = 'none';
+    optionsDiv.style.display = 'none';
+    main.style.display = 'grid';
 }
 
 let markSquare = ((idx)=>{
@@ -262,7 +271,7 @@ function displayBoard(){
         clearInterval(markSquare);
         gameBoard.board.forEach((char, idx)=>{
             let el = `
-                <h3 data-index=${idx} onclick="markSquare(${idx})">${char}</h3>
+                <p data-index=${idx} onclick="markSquare(${idx})">${char}</p>
             `;
             main.innerHTML += el;
         });
