@@ -263,3 +263,7 @@ button:hover {
     justify-content: center;
 
 }
+
+.enter-name {
+    display: none;
+}

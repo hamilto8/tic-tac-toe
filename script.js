@@ -52,6 +52,10 @@ let gameBoard = {
             [],[],[]]
 };
 
+const playerFactory = (char, name = 'Player') => {
+    return {playerChar: char, playerName: name}
+}
+
 tictacLogo.addEventListener('click', restartGame);
 
 function setOnePlayerGame(){
@@ -170,12 +174,11 @@ let markSquare = ((idx)=>{
     } else {
         start = true;
         playerStatus.style.display = 'flex';
-        if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar){
+        if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar || gameBoard.board[idx] === playerTwoChar){
             takenNotice(idx);
             playerTurn = true;
         } else { if(playerTurn){
             playerTurn = false;
-            
             if(playSound){
                 playerSound.play();
             }
