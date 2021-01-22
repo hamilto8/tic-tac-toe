@@ -3,21 +3,29 @@
     font-weight: bold;
     padding: none;
     margin: 0;
+    
+}
+
+html {
+    position: absolute;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background: rgb(2,0,36);
+    background: linear-gradient(0deg, rgba(2,0,36,1) 0%, rgba(121,9,9,1) 37%, rgba(255,235,149,1) 100%);
 }
 
 body {
-    background-image: url('./images//bg.jpg');
-    height: 100%;
-    width: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: rgb(255, 245, 231);
+   
 }
 
 #main {
     border-radius: .3em;
     display: none;
-    position: relative;
     grid-template-columns: repeat(3, 1fr);
     font-family: 'Courier New', Courier, monospace;
     font-weight: 800;
@@ -30,6 +38,8 @@ body {
     margin: 0 auto;
     background-color: #fff;
     border: 5px solid black;
+    z-index: 1;
+    
 }
 
 #main p{
@@ -68,8 +78,8 @@ body {
     margin-bottom: 2em;
     background-color: rgb(117, 0, 0);
     box-shadow: 0px 2px 5px red;
-    padding: none;
     padding: 10px;
+    z-index: 5;
 }
 
 .header h4 {
@@ -206,12 +216,15 @@ button:hover {
 }
 
 .options {
-    display: block;
+    display: flex;
+    color: #fff;
     margin: 0 auto;
-    padding: 15px;
-    height: 100px;
-    background-color: rgb(189, 189, 189);
-    border:  2px solid black;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
 }
 
 .choose-player-count  {
@@ -230,6 +243,7 @@ button:hover {
 .player-status {
     height: 1em;
     width: 100%;
+    color: #fff;
     text-align: center;
     justify-content: center;
     align-items: center;
@@ -237,4 +251,15 @@ button:hover {
 
 #tic-tac-logo:hover {
     cursor: pointer;
+}
+
+.container{
+    margin: 0 auto;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+
 }

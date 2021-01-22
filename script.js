@@ -17,6 +17,7 @@ const playerStatus = document.querySelector('.player-status');
 const tictacLogo = document.querySelector('#tic-tac-logo');
 const optionsDiv = document.querySelector('.options');
 
+const bassDrum = new Audio('./sound/bassDrum.mp3');
 const playerSound = new Audio('./sound/light-beep.mp3');
 const computerSound = new Audio('./sound/low-beep.mp3');
 const gameWinSound = new Audio('./sound/success.mp3');
@@ -55,13 +56,15 @@ tictacLogo.addEventListener('click', restartGame);
 
 function setOnePlayerGame(){
     chooseGameStyle.style.display = 'none';
-    choiceDiv.style.display = 'flex';
+    choiceDiv.style.display = 'grid';
+    bassDrum.play();
     twoPlayer = false;
 }
 
 function setTwoPlayerGame(){
     chooseGameStyle.style.display = 'none';
-    choiceDiv.style.display = 'flex';
+    choiceDiv.style.display = 'grid';
+    bassDrum.play();
     twoPlayer = true;
 }
 
@@ -103,6 +106,7 @@ function restartGame(){
     gameOverNotice.style.display = 'none';
     chooseGameStyle.style.display = 'block';
     optionsDiv.style.display = 'block';
+    choiceDiv.style.display = 'none';
     main.style.display = 'none';
     playerStatus.innerHTML = '';
     gameBoard.board = [[],[],[],[],[],[],[],[],[]];
@@ -115,6 +119,9 @@ function restartGame(){
     main.innerHTML = '';
     gameOver = false;
     start = false;
+    if(playSound){
+        bassDrum.play()
+    }
     displayBoard();
 }
 
@@ -130,6 +137,7 @@ function makeChoiceX(){
     choiceDiv.style.display = 'none';
     optionsDiv.style.display = 'none';
     main.style.display = 'grid';
+    bassDrum.play();
 }
 
 function makeChoiceO(){
@@ -144,6 +152,7 @@ function makeChoiceO(){
     choiceDiv.style.display = 'none';
     optionsDiv.style.display = 'none';
     main.style.display = 'grid';
+    bassDrum.play();
 }
 
 let markSquare = ((idx)=>{
