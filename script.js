@@ -1,317 +1,781 @@
-const main = document.querySelector('#main');
-const chooseX = document.querySelector('.chooseX');
-const chooseO = document.querySelector('.chooseO');
-const choiceDiv = document.querySelector('.makeChoice');
-const squares = document.querySelectorAll('.square');
-const soundButton = document.querySelector('.sound');
-const playAgainButton = document.querySelector('.playAgain');
-const chooseCharDiv = document.querySelector('.chooseChar');
-const okayButton = document.querySelector('.okayButton');
-const takenSquareDiv = document.querySelector('.takenSquare');
-const gameWonNotice = document.querySelector('.gameWon');
-const gameOverNotice = document.querySelector('.gameOver');
-const chooseGameStyle = document.querySelector('.choose-player-count');
-const chooseOnePlayer = document.querySelector('.one-player');
-const chooseTwoPlayer = document.querySelector('.two-player');
-const playerStatus = document.querySelector('.player-status');
-const tictacLogo = document.querySelector('#tic-tac-logo');
-const optionsDiv = document.querySelector('.options');
+/**
+ * ============================================================================
+ * Tic Tac Toe — Modern Edition (Engine & UI Controller)
+ * Follows modular architecture, secure coding practices, and unbeatable AI logic.
+ * ============================================================================
+ */
 
-const bassDrum = new Audio('./sound/bassDrum.mp3');
-const playerSound = new Audio('./sound/light-beep.mp3');
-const computerSound = new Audio('./sound/low-beep.mp3');
-const gameWinSound = new Audio('./sound/success.mp3');
-const gameLostSound = new Audio('./sound/failure.mp3');
-const wrongSquareAlarm = new Audio('./sound/wrong.mp3');
+(() => {
+  'use strict';
 
-let chosenChar;
-let playerTwoChar;
-let computerChar;
+  /* ==========================================================================
+     1. SOUND MANAGER
+     ========================================================================== */
+  const SoundManager = {
+    sounds: {
+      click: new Audio('./sound/bassDrum.mp3'),
+      moveX: new Audio('./sound/light-beep.mp3'),
+      moveO: new Audio('./sound/low-beep.mp3'),
+      win: new Audio('./sound/success.mp3'),
+      lose: new Audio('./sound/failure.mp3'),
+      tie: new Audio('./sound/alert.mp3'),
+      error: new Audio('./sound/wrong.mp3'),
+    },
+    isMuted: false,
 
-let start = false;
-let twoPlayer = false;
-let gameOver = false;
-let playerTurn;
-let playerTwoTurn = false;
-let playSound = true;
-
-soundButton.addEventListener('click', changeSoundSetting);
-playAgainButton.addEventListener('click', restartGame);
-okayButton.addEventListener('click', confirmNoChar);
-
-chooseOnePlayer.addEventListener('click', setOnePlayerGame);
-chooseTwoPlayer.addEventListener('click', setTwoPlayerGame);
-
-chooseX.addEventListener('click', makeChoiceX);
-chooseO.addEventListener('click', makeChoiceO);
-
-
-let gameBoard = {
-    board: [[],[],[],
-            [],[],[],
-            [],[],[]]
-};
-
-const playerFactory = (char, name = 'Player') => {
-    return {playerChar: char, playerName: name}
-}
-
-tictacLogo.addEventListener('click', restartGame);
-
-function setOnePlayerGame(){
-    chooseGameStyle.style.display = 'none';
-    choiceDiv.style.display = 'grid';
-    bassDrum.play();
-    twoPlayer = false;
-}
-
-function setTwoPlayerGame(){
-    chooseGameStyle.style.display = 'none';
-    choiceDiv.style.display = 'grid';
-    bassDrum.play();
-    twoPlayer = true;
-}
-
-function switchPlayers(){
-    playerStatus.innerHTML = '';
-    if(playerTurn && !playerTwoTurn){
-        playerStatus.innerHTML += `
-        <h3>Player 1 Turn</h3>
-        `;
-        if(twoPlayer){
-            playerTwoTurn = true;
+    init() {
+      // Load mute setting from localStorage if available
+      try {
+        const savedMute = localStorage.getItem('ttt_muted');
+        if (savedMute !== null) {
+          this.isMuted = savedMute === 'true';
         }
-    } else if (playerTwoTurn) {
-        playerStatus.innerHTML += `
-        <h3>Player 2 Turn</h3>
-        `;
-        playerTwoTurn = false;
-    } else {
-        playerStatus.innerHTML += `
-        <h3>Computer Turn</h3>
-        `;
-    }
-    if(!gameBoard.board.some(fullBoard)){
-        gameOver = true;
-        main.innerHTML = '';
-        displayBoard();
-    }
-}
+      } catch (e) {
+        console.warn('localStorage access denied or unavailable:', e);
+      }
+    },
 
-function confirmNoChar(){
-    chooseCharDiv.style.display = 'none';
-    chooseCharDiv.style.opacity = '0';
-    chooseGameStyle.style.display = 'block';
-}
+    play(soundName) {
+      if (this.isMuted || !this.sounds[soundName]) return;
+      
+      try {
+        const audio = this.sounds[soundName];
+        audio.currentTime = 0;
+        audio.play().catch(err => {
+          // Browser autoplay policy might block audio before first user interaction
+          console.debug('Audio play blocked by browser policy:', err);
+        });
+      } catch (e) {
+        console.error('Error playing sound:', e);
+      }
+    },
 
-function restartGame(){
-    playAgainButton.style.display = 'none';
-    gameWonNotice.style.display = 'none';
-    gameOverNotice.style.display = 'none';
-    chooseGameStyle.style.display = 'block';
-    optionsDiv.style.display = 'block';
-    choiceDiv.style.display = 'none';
-    main.style.display = 'none';
-    playerStatus.innerHTML = '';
-    gameBoard.board = [[],[],[],[],[],[],[],[],[]];
-    chosenChar = undefined;
-    playerTwoChar = undefined;
-    computerChar = undefined;
-    playerTurn = undefined;
-    twoPlayer = undefined;
-    playerTwoTurn = false;
-    main.innerHTML = '';
-    gameOver = false;
-    start = false;
-    if(playSound){
-        bassDrum.play()
+    toggleMute() {
+      this.isMuted = !this.isMuted;
+      try {
+        localStorage.setItem('ttt_muted', String(this.isMuted));
+      } catch (e) {
+        // Ignore localStorage error
+      }
+      return this.isMuted;
     }
-    displayBoard();
-}
+  };
 
-function makeChoiceX(){
-    chosenChar = 'x';
-    if(twoPlayer){
-        playerTwoChar = 'o';
-    } else {
-        computerChar = 'o';
-    }
-    playerTurn = true;
-    switchPlayers();
-    choiceDiv.style.display = 'none';
-    optionsDiv.style.display = 'none';
-    main.style.display = 'grid';
-    bassDrum.play();
-}
+  /* ==========================================================================
+     2. GAMEBOARD STATE
+     ========================================================================== */
+  const Gameboard = {
+    board: Array(9).fill(null),
+    winningCombos: [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+      [0, 4, 8], [2, 4, 6]              // Diagonals
+    ],
 
-function makeChoiceO(){
-    chosenChar = 'o';
-    if(twoPlayer){
-        playerTwoChar = 'x';
-    } else {
-        computerChar = 'x';
-    }
-    playerTurn = true;
-    switchPlayers();
-    choiceDiv.style.display = 'none';
-    optionsDiv.style.display = 'none';
-    main.style.display = 'grid';
-    bassDrum.play();
-}
+    reset() {
+      this.board = Array(9).fill(null);
+    },
 
-let markSquare = ((idx)=>{
-    if(chosenChar !== 'x' && chosenChar !== 'o'){
-        if(playSound){
-            wrongSquareAlarm.play();
+    setCell(index, marker) {
+      if (index < 0 || index > 8 || this.board[index] !== null) {
+        return false;
+      }
+      this.board[index] = marker;
+      return true;
+    },
+
+    getCell(index) {
+      return this.board[index];
+    },
+
+    getEmptyIndices(customBoard = this.board) {
+      const empty = [];
+      for (let i = 0; i < customBoard.length; i++) {
+        if (customBoard[i] === null) empty.push(i);
+      }
+      return empty;
+    },
+
+    isFull(customBoard = this.board) {
+      return !customBoard.includes(null);
+    },
+
+    /**
+     * Checks if a given board state has a winner.
+     * @param {Array} customBoard - The 9-element board array to evaluate.
+     * @returns {Object|null} - { winner: 'X'|'O', combo: [indices] } or null.
+     */
+    checkWin(customBoard = this.board) {
+      for (const combo of this.winningCombos) {
+        const [a, b, c] = combo;
+        if (
+          customBoard[a] !== null &&
+          customBoard[a] === customBoard[b] &&
+          customBoard[a] === customBoard[c]
+        ) {
+          return { winner: customBoard[a], combo };
         }
-        chooseCharDiv.style.display = 'flex';
-        chooseCharDiv.style.opacity = '.9';
-        chooseGameStyle.style.display = 'none';
-        choiceDiv.style.display = 'none';
-    } else if(!gameBoard.board.some(fullBoard)){
-         gameOver = true;
-         displayBoard();
-    } else {
-        start = true;
-        playerStatus.style.display = 'flex';
-        if(gameBoard.board[idx] === computerChar || gameBoard.board[idx] === chosenChar || gameBoard.board[idx] === playerTwoChar){
-            takenNotice(idx);
-            playerTurn = true;
-        } else { if(playerTurn){
-            playerTurn = false;
-            if(playSound){
-                playerSound.play();
-            }
-            if(twoPlayer){
-                if(!playerTwoTurn){
-                    gameBoard.board[idx] = playerTwoChar
-                } else {
-                    gameBoard.board[idx] = chosenChar;
-                }
-            } else {
-                gameBoard.board[idx] = chosenChar;
-            }
-            
-        }
+      }
+      return null;
+    }
+  };
 
+  /* ==========================================================================
+     3. AI CONTROLLER (Minimax Algorithm & Difficulties)
+     ========================================================================== */
+  const AIController = {
+    /**
+     * Determines the AI's move based on selected difficulty.
+     * @param {Array} board - Current board array.
+     * @param {string} aiMarker - AI's symbol ('X' or 'O').
+     * @param {string} humanMarker - Human's symbol ('X' or 'O').
+     * @param {string} difficulty - 'easy', 'medium', or 'hard'.
+     * @returns {number} - The chosen cell index (0-8).
+     */
+    getMove(board, aiMarker, humanMarker, difficulty) {
+      const emptyIndices = Gameboard.getEmptyIndices(board);
+      if (emptyIndices.length === 0) return -1;
+
+      if (difficulty === 'easy') {
+        return this.getEasyMove(emptyIndices);
+      } else if (difficulty === 'medium') {
+        return this.getMediumMove(board, emptyIndices, aiMarker, humanMarker);
+      } else {
+        return this.getHardMove(board, aiMarker, humanMarker);
+      }
+    },
+
+    getEasyMove(emptyIndices) {
+      const randomIndex = Math.floor(Math.random() * emptyIndices.length);
+      return emptyIndices[randomIndex];
+    },
+
+    getMediumMove(board, emptyIndices, aiMarker, humanMarker) {
+      // 1. Check if AI can win in 1 move
+      for (const idx of emptyIndices) {
+        const boardCopy = [...board];
+        boardCopy[idx] = aiMarker;
+        if (Gameboard.checkWin(boardCopy)) return idx;
+      }
+
+      // 2. Check if Human can win in 1 move -> Block them
+      for (const idx of emptyIndices) {
+        const boardCopy = [...board];
+        boardCopy[idx] = humanMarker;
+        if (Gameboard.checkWin(boardCopy)) return idx;
+      }
+
+      // 3. Take center if available
+      if (board[4] === null) return 4;
+
+      // 4. Otherwise, random move from remaining empty cells
+      return this.getEasyMove(emptyIndices);
+    },
+
+    getHardMove(board, aiMarker, humanMarker) {
+      // Unbeatable Minimax Algorithm
+      const bestMove = this.minimax(board, 0, true, -Infinity, Infinity, aiMarker, humanMarker);
+      return bestMove.index;
+    },
+
+    /**
+     * Recursive Minimax with Alpha-Beta Pruning.
+     */
+    minimax(board, depth, isMaximizing, alpha, beta, aiMarker, humanMarker) {
+      const winResult = Gameboard.checkWin(board);
+      if (winResult !== null) {
+        // If AI wins, return high score minus depth (prefer faster wins)
+        // If Human wins, return low score plus depth (delay losses)
+        return winResult.winner === aiMarker
+          ? { score: 100 - depth }
+          : { score: depth - 100 };
+      }
+
+      const emptyIndices = Gameboard.getEmptyIndices(board);
+      if (emptyIndices.length === 0) {
+        return { score: 0 }; // Tie
+      }
+
+      if (isMaximizing) {
+        let maxScore = -Infinity;
+        let bestIndex = emptyIndices[0];
+
+        for (const idx of emptyIndices) {
+          board[idx] = aiMarker;
+          const result = this.minimax(board, depth + 1, false, alpha, beta, aiMarker, humanMarker);
+          board[idx] = null; // Backtrack
+
+          if (result.score > maxScore) {
+            maxScore = result.score;
+            bestIndex = idx;
+          }
+          alpha = Math.max(alpha, maxScore);
+          if (beta <= alpha) break; // Prune branch
         }
-        main.innerHTML = '';
-        displayBoard();
-        if(checkWin()){
-            gameOver = true;
+        return { score: maxScore, index: bestIndex };
+      } else {
+        let minScore = Infinity;
+        let bestIndex = emptyIndices[0];
+
+        for (const idx of emptyIndices) {
+          board[idx] = humanMarker;
+          const result = this.minimax(board, depth + 1, true, alpha, beta, aiMarker, humanMarker);
+          board[idx] = null; // Backtrack
+
+          if (result.score < minScore) {
+            minScore = result.score;
+            bestIndex = idx;
+          }
+          beta = Math.min(beta, minScore);
+          if (beta <= alpha) break; // Prune branch
+        }
+        return { score: minScore, index: bestIndex };
+      }
+    }
+  };
+
+  /* ==========================================================================
+     4. GAME ENGINE / CONTROLLER
+     ========================================================================== */
+  const GameEngine = {
+    state: {
+      mode: 'pvc',            // 'pvc' | 'pvp'
+      difficulty: 'medium',   // 'easy' | 'medium' | 'hard'
+      player1: { name: 'Player 1', marker: 'X', score: 0 },
+      player2: { name: 'Computer', marker: 'O', score: 0, isAi: true },
+      ties: 0,
+      currentTurn: 1,         // 1 for Player 1, 2 for Player 2 / AI
+      isPlaying: false,
+      isAiThinking: false
+    },
+
+    initGame(config) {
+      this.state.mode = config.mode;
+      this.state.difficulty = config.difficulty;
+      
+      // Sanitize names and set defaults
+      const p1Name = (config.p1Name || 'Player 1').trim() || 'Player 1';
+      const p2Default = config.mode === 'pvc' ? 'Computer' : 'Player 2';
+      const p2Name = (config.p2Name || p2Default).trim() || p2Default;
+      
+      this.state.player1 = {
+        name: p1Name,
+        marker: config.p1Marker,
+        score: 0
+      };
+
+      this.state.player2 = {
+        name: p2Name,
+        marker: config.p1Marker === 'X' ? 'O' : 'X',
+        score: 0,
+        isAi: config.mode === 'pvc'
+      };
+
+      this.state.ties = 0;
+      this.startRound();
+    },
+
+    startRound() {
+      Gameboard.reset();
+      this.state.isPlaying = true;
+      this.state.isAiThinking = false;
+      
+      // X always goes first in standard Tic Tac Toe
+      this.state.currentTurn = this.state.player1.marker === 'X' ? 1 : 2;
+      
+      UIController.renderBoard();
+      UIController.updateScoreboard(this.state);
+      UIController.updateTurnIndicator(this.getCurrentPlayer());
+
+      // If AI is player 2 and has 'X', AI moves first!
+      if (this.state.currentTurn === 2 && this.state.player2.isAi) {
+        this.triggerAiTurn();
+      }
+    },
+
+    getCurrentPlayer() {
+      return this.state.currentTurn === 1 ? this.state.player1 : this.state.player2;
+    },
+
+    handleCellClick(index) {
+      if (!this.state.isPlaying || this.state.isAiThinking) return;
+
+      const cellContent = Gameboard.getCell(index);
+      if (cellContent !== null) {
+        SoundManager.play('error');
+        UIController.showToast('That square is already taken!');
+        return;
+      }
+
+      const currentPlayer = this.getCurrentPlayer();
+      this.executeMove(index, currentPlayer);
+    },
+
+    executeMove(index, player) {
+      Gameboard.setCell(index, player.marker);
+      
+      // Play sound
+      SoundManager.play(player.marker === 'X' ? 'moveX' : 'moveO');
+      
+      // Update DOM
+      UIController.renderCell(index, player.marker);
+
+      // Check win or tie
+      const winResult = Gameboard.checkWin();
+      if (winResult !== null) {
+        this.handleGameOver(winResult);
+        return;
+      }
+
+      if (Gameboard.isFull()) {
+        this.handleGameOver(null); // Tie
+        return;
+      }
+
+      // Switch turn
+      this.state.currentTurn = this.state.currentTurn === 1 ? 2 : 1;
+      UIController.updateTurnIndicator(this.getCurrentPlayer());
+
+      // If next turn is AI, trigger AI move
+      if (this.state.currentTurn === 2 && this.state.player2.isAi) {
+        this.triggerAiTurn();
+      }
+    },
+
+    triggerAiTurn() {
+      this.state.isAiThinking = true;
+      UIController.setBoardDisabled(true);
+
+      // Add a slight natural delay for AI thinking
+      setTimeout(() => {
+        if (!this.state.isPlaying) return;
+
+        const aiMove = AIController.getMove(
+          Gameboard.board,
+          this.state.player2.marker,
+          this.state.player1.marker,
+          this.state.difficulty
+        );
+
+        this.state.isAiThinking = false;
+        UIController.setBoardDisabled(false);
+
+        if (aiMove !== -1) {
+          this.executeMove(aiMove, this.state.player2);
+        }
+      }, 500);
+    },
+
+    handleGameOver(winResult) {
+      this.state.isPlaying = false;
+      this.state.isAiThinking = false;
+      UIController.setBoardDisabled(true);
+
+      if (winResult !== null) {
+        // We have a winner
+        const isPlayer1Win = winResult.winner === this.state.player1.marker;
+        const winner = isPlayer1Win ? this.state.player1 : this.state.player2;
+        
+        winner.score += 1;
+        
+        // Play appropriate win/lose sound
+        if (this.state.mode === 'pvc') {
+          SoundManager.play(isPlayer1Win ? 'win' : 'lose');
         } else {
-            if(!playerTurn && !twoPlayer){
-                switchPlayers();
-                setTimeout(() => {
-                    if(start){
-                        if(playSound){
-                            computerSound.play();
-                        }
-                        computerChoice();
-                        main.innerHTML = '';
-                        displayBoard();      
-                    }
-                }, 900);
-            } else if (twoPlayer){
-                playerTurn = true;
-                switchPlayers();
-            }
+          SoundManager.play('win');
         }
-    }
-});
 
-function takenNotice(){
-   takenSquareDiv.style.display = 'flex';
-   if(playSound){
-       wrongSquareAlarm.play();
-   }
-   setTimeout(() => {
-       takenSquareDiv.style.display = 'none';
-   }, 800);
-}
-
-function fullBoard(el){
-    return el.length === 0;
-}
-
-function computerChoice(){
-    let idx = Math.floor(Math.random() * gameBoard.board.length);
-    if(gameBoard.board[idx] !== 'x' && gameBoard.board[idx] !== 'o'){
-        gameBoard.board[idx] = computerChar;
-        playerTurn = true;
-    } else if(!gameBoard.board.some(fullBoard)){
-        gameOver = true;
-        displayBoard();
-    } else {
-        computerChoice();
-    }
-    switchPlayers();
-}
-
-// let displayController = {
-
-// };
-
-function checkWin(){
-    let won = false;
-    
-    if(gameBoard.board[0] === gameBoard.board[1] && gameBoard.board[1] === gameBoard.board[2]){
-        won = true;
-    }  else if (gameBoard.board[3] === gameBoard.board[4] && gameBoard.board[4] === gameBoard.board[5]){
-        won = true;
-    } else if (gameBoard.board[6] === gameBoard.board[7] && gameBoard.board[7] === gameBoard.board[8]){
-        won = true;
-    } else if (gameBoard.board[0] === gameBoard.board[3] && gameBoard.board[3] === gameBoard.board[6]){
-        won = true;
-    } else if (gameBoard.board[1] === gameBoard.board[4] && gameBoard.board[4] === gameBoard.board[7]){
-        won = true;
-    } else if (gameBoard.board[2] === gameBoard.board[5] && gameBoard.board[5] === gameBoard.board[8]){
-        won = true;
-    } 
-    return won;
-}
-
-function displayBoard(){
-    if(gameOver){
-        if(playSound){
-            gameLostSound.play();
-        }
-        playAgainButton.style.display = 'flex';
-        gameOverNotice.style.display = 'flex';
-    }
-    if(checkWin()){
-        clearInterval(markSquare);
-        gameBoard.board.forEach((char, idx)=>{
-            let el = `
-                <p data-index=${idx} onclick="markSquare(${idx})">${char}</p>
-            `;
-            main.innerHTML += el;
-        });
-        if(playSound){
-            gameWinSound.play();
-        }
-        playAgainButton.style.display = 'block';
-        gameWonNotice.style.display = 'flex';
+        UIController.highlightWinningCells(winResult.combo);
+        UIController.updateScoreboard(this.state);
         
-    } else {
-        gameBoard.board.forEach((char, idx)=>{
-            let el = `
-                <p data-index=${idx}  onclick="markSquare(${idx})">${char}</p>
-            `;
-            main.innerHTML += el;
-        });
+        setTimeout(() => {
+          UIController.showResultModal({
+            type: 'win',
+            winnerName: winner.name,
+            winnerMarker: winner.marker,
+            isAiWin: winner.isAi
+          });
+        }, 650);
+      } else {
+        // Tie Game
+        this.state.ties += 1;
+        SoundManager.play('tie');
+        UIController.updateScoreboard(this.state);
         
+        setTimeout(() => {
+          UIController.showResultModal({ type: 'tie' });
+        }, 500);
+      }
     }
-}
+  };
 
-function changeSoundSetting(){
-    if (soundButton.innerHTML === `<i class="fas fa-volume-up"></i>`){
-        playSound = false;
-        soundButton.innerHTML = `<i class="fas fa-volume-mute"></i>`;
-    } else {
-        playSound = true;
-        soundButton.innerHTML = `<i class="fas fa-volume-up"></i>`;
+  /* ==========================================================================
+     5. UI CONTROLLER (DOM Manipulation & Events)
+     ========================================================================== */
+  const UIController = {
+    elements: {
+      setupScreen: document.getElementById('setup-screen'),
+      gameScreen: document.getElementById('game-screen'),
+      logoBtn: document.getElementById('logo-button'),
+      soundToggleBtn: document.getElementById('sound-toggle-btn'),
+      settingsBtn: document.getElementById('settings-btn'),
+      
+      // Setup elements
+      modeBtns: document.querySelectorAll('.mode-btn'),
+      diffBtns: document.querySelectorAll('.diff-btn'),
+      diffGroup: document.getElementById('difficulty-group'),
+      p1NameInput: document.getElementById('player1-name'),
+      p2NameInput: document.getElementById('player2-name'),
+      p2Label: document.getElementById('player2-label'),
+      p2Icon: document.getElementById('player2-icon'),
+      p2MarkerPreview: document.getElementById('player2-marker-preview'),
+      markerBtns: document.querySelectorAll('.marker-btn'),
+      startGameBtn: document.getElementById('start-game-btn'),
+      
+      // Scoreboard
+      p1ScoreCard: document.getElementById('score-card-p1'),
+      p2ScoreCard: document.getElementById('score-card-p2'),
+      p1NameDisplay: document.getElementById('p1-name-display'),
+      p2NameDisplay: document.getElementById('p2-name-display'),
+      p1MarkerDisplay: document.getElementById('p1-marker-display'),
+      p2MarkerDisplay: document.getElementById('p2-marker-display'),
+      p1ScoreNum: document.getElementById('p1-score'),
+      p2ScoreNum: document.getElementById('p2-score'),
+      tiesScoreNum: document.getElementById('ties-score'),
+      
+      // Turn indicator & board
+      turnIndicator: document.getElementById('turn-indicator'),
+      turnText: document.getElementById('turn-text'),
+      turnSymbol: document.getElementById('turn-symbol'),
+      gameBoard: document.getElementById('game-board'),
+      cells: document.querySelectorAll('.cell'),
+      resetRoundBtn: document.getElementById('reset-round-btn'),
+      newGameBtn: document.getElementById('new-game-btn'),
+      
+      // Modals & Toast
+      resultModal: document.getElementById('result-modal'),
+      modalTitle: document.getElementById('modal-title'),
+      modalSubtitle: document.getElementById('modal-subtitle'),
+      modalIcon: document.getElementById('modal-icon'),
+      playAgainBtn: document.getElementById('play-again-btn'),
+      modalSettingsBtn: document.getElementById('modal-settings-btn'),
+      toastContainer: document.getElementById('toast-container')
+    },
+
+    init() {
+      SoundManager.init();
+      this.updateSoundIcon();
+      this.bindEvents();
+    },
+
+    bindEvents() {
+      // Top controls
+      this.elements.soundToggleBtn.addEventListener('click', () => {
+        const isMuted = SoundManager.toggleMute();
+        this.updateSoundIcon();
+        if (!isMuted) SoundManager.play('click');
+      });
+
+      this.elements.logoBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        this.showSetupScreen();
+      });
+
+      this.elements.settingsBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        this.showSetupScreen();
+      });
+
+      // Setup Screen Controls
+      this.elements.modeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          SoundManager.play('click');
+          const mode = btn.dataset.mode;
+          this.setMode(mode);
+        });
+      });
+
+      this.elements.diffBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          SoundManager.play('click');
+          this.elements.diffBtns.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-checked', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-checked', 'true');
+        });
+      });
+
+      this.elements.markerBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          SoundManager.play('click');
+          const chosenMarker = btn.dataset.marker;
+          this.setPlayerMarker(chosenMarker);
+        });
+      });
+
+      this.elements.startGameBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        this.handleStartGame();
+      });
+
+      // Board Clicks
+      this.elements.gameBoard.addEventListener('click', (e) => {
+        const cell = e.target.closest('.cell');
+        if (!cell) return;
+        const index = parseInt(cell.dataset.index, 10);
+        GameEngine.handleCellClick(index);
+      });
+
+      // Footer Actions
+      this.elements.resetRoundBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        GameEngine.startRound();
+      });
+
+      this.elements.newGameBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        this.showSetupScreen();
+      });
+
+      // Modal Actions
+      this.elements.playAgainBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        this.elements.resultModal.classList.add('hidden');
+        GameEngine.startRound();
+      });
+
+      this.elements.modalSettingsBtn.addEventListener('click', () => {
+        SoundManager.play('click');
+        this.elements.resultModal.classList.add('hidden');
+        this.showSetupScreen();
+      });
+
+      // Keyboard Accessibility for Logo
+      this.elements.logoBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          SoundManager.play('click');
+          this.showSetupScreen();
+        }
+      });
+    },
+
+    updateSoundIcon() {
+      const icon = this.elements.soundToggleBtn.querySelector('i');
+      if (SoundManager.isMuted) {
+        icon.className = 'fa-solid fa-volume-xmark';
+        this.elements.soundToggleBtn.setAttribute('aria-label', 'Unmute Sound');
+      } else {
+        icon.className = 'fa-solid fa-volume-high';
+        this.elements.soundToggleBtn.setAttribute('aria-label', 'Mute Sound');
+      }
+    },
+
+    setMode(mode) {
+      this.elements.modeBtns.forEach(b => {
+        const isActive = b.dataset.mode === mode;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-checked', String(isActive));
+      });
+
+      if (mode === 'pvc') {
+        this.elements.diffGroup.style.display = 'block';
+        this.elements.p2Label.textContent = 'Opponent Name';
+        this.elements.p2NameInput.value = 'Computer';
+        this.elements.p2NameInput.disabled = true;
+        this.elements.p2Icon.className = 'fa-solid fa-robot input-icon';
+      } else {
+        this.elements.diffGroup.style.display = 'none';
+        this.elements.p2Label.textContent = 'Player 2 Name';
+        this.elements.p2NameInput.value = '';
+        this.elements.p2NameInput.placeholder = 'Player 2';
+        this.elements.p2NameInput.disabled = false;
+        this.elements.p2Icon.className = 'fa-solid fa-user input-icon';
+      }
+    },
+
+    setPlayerMarker(marker) {
+      this.elements.markerBtns.forEach(b => {
+        const isActive = b.dataset.marker === marker;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-checked', String(isActive));
+      });
+
+      const oppMarker = marker === 'X' ? 'O' : 'X';
+      this.elements.p2MarkerPreview.textContent = oppMarker;
+      this.elements.p2MarkerPreview.className = `marker-badge marker-${oppMarker.toLowerCase()}`;
+    },
+
+    handleStartGame() {
+      const activeModeBtn = document.querySelector('.mode-btn.active');
+      const activeDiffBtn = document.querySelector('.diff-btn.active');
+      const activeMarkerBtn = document.querySelector('.marker-btn.active');
+
+      const config = {
+        mode: activeModeBtn ? activeModeBtn.dataset.mode : 'pvc',
+        difficulty: activeDiffBtn ? activeDiffBtn.dataset.diff : 'medium',
+        p1Name: this.elements.p1NameInput.value,
+        p2Name: this.elements.p2NameInput.value,
+        p1Marker: activeMarkerBtn ? activeMarkerBtn.dataset.marker : 'X'
+      };
+
+      GameEngine.initGame(config);
+      this.showGameScreen();
+    },
+
+    showSetupScreen() {
+      this.elements.gameScreen.classList.remove('active');
+      this.elements.gameScreen.classList.add('hidden');
+      this.elements.resultModal.classList.add('hidden');
+      
+      this.elements.setupScreen.classList.remove('hidden');
+      this.elements.setupScreen.classList.add('active');
+      
+      this.elements.settingsBtn.classList.add('hidden');
+    },
+
+    showGameScreen() {
+      this.elements.setupScreen.classList.remove('active');
+      this.elements.setupScreen.classList.add('hidden');
+      
+      this.elements.gameScreen.classList.remove('hidden');
+      this.elements.gameScreen.classList.add('active');
+      
+      this.elements.settingsBtn.classList.remove('hidden');
+    },
+
+    renderBoard() {
+      this.elements.cells.forEach((cell, idx) => {
+        cell.textContent = '';
+        cell.className = 'cell';
+        cell.removeAttribute('disabled');
+        cell.setAttribute('aria-label', `Cell ${idx}, empty`);
+        
+        // Set hover preview class
+        const currentMarker = GameEngine.getCurrentPlayer().marker.toLowerCase();
+        cell.classList.add(`preview-${currentMarker}`);
+      });
+      this.setBoardDisabled(false);
+    },
+
+    renderCell(index, marker) {
+      const cell = this.elements.cells[index];
+      if (!cell) return;
+
+      const markerLower = marker.toLowerCase();
+      cell.textContent = marker;
+      cell.classList.add(`marked-${markerLower}`, 'taken');
+      cell.classList.remove('preview-x', 'preview-o');
+      cell.setAttribute('aria-label', `Cell ${index}, marked ${marker}`);
+    },
+
+    setBoardDisabled(disabled) {
+      this.elements.cells.forEach(cell => {
+        if (disabled || cell.classList.contains('taken')) {
+          cell.classList.add('disabled');
+        } else {
+          cell.classList.remove('disabled');
+        }
+      });
+    },
+
+    highlightWinningCells(combo) {
+      if (!combo) return;
+      combo.forEach(idx => {
+        if (this.elements.cells[idx]) {
+          this.elements.cells[idx].classList.add('winning-cell');
+        }
+      });
+    },
+
+    updateScoreboard(state) {
+      // Secure textContent to prevent XSS
+      this.elements.p1NameDisplay.textContent = state.player1.name;
+      this.elements.p2NameDisplay.textContent = state.player2.name;
+      
+      this.elements.p1MarkerDisplay.textContent = state.player1.marker;
+      this.elements.p1MarkerDisplay.className = `symbol-badge marker-${state.player1.marker.toLowerCase()}`;
+      
+      this.elements.p2MarkerDisplay.textContent = state.player2.marker;
+      this.elements.p2MarkerDisplay.className = `symbol-badge marker-${state.player2.marker.toLowerCase()}`;
+      
+      this.elements.p1ScoreNum.textContent = state.player1.score;
+      this.elements.p2ScoreNum.textContent = state.player2.score;
+      this.elements.tiesScoreNum.textContent = state.ties;
+    },
+
+    updateTurnIndicator(currentPlayer) {
+      // Update turn indicator text & badge
+      this.elements.turnText.textContent = `${currentPlayer.name}'s Turn`;
+      const markerLower = currentPlayer.marker.toLowerCase();
+      this.elements.turnSymbol.textContent = currentPlayer.marker;
+      this.elements.turnSymbol.className = `symbol-badge marker-${markerLower}`;
+
+      // Update active card glow
+      const isP1Turn = GameEngine.state.currentTurn === 1;
+      this.elements.p1ScoreCard.classList.toggle('active-turn', isP1Turn);
+      this.elements.p2ScoreCard.classList.toggle('active-turn', !isP1Turn);
+
+      // Update empty cell hover previews
+      this.elements.cells.forEach(cell => {
+        if (!cell.classList.contains('taken')) {
+          cell.classList.remove('preview-x', 'preview-o');
+          cell.classList.add(`preview-${markerLower}`);
+        }
+      });
+    },
+
+    showResultModal({ type, winnerName, winnerMarker, isAiWin }) {
+      this.elements.modalIcon.className = 'modal-icon-wrapper';
+      
+      if (type === 'win') {
+        const markerLower = winnerMarker.toLowerCase();
+        this.elements.modalIcon.classList.add(`win-${markerLower}`);
+        
+        if (isAiWin) {
+          this.elements.modalIcon.innerHTML = '<i class="fa-solid fa-robot"></i>';
+          this.elements.modalTitle.textContent = `${winnerName} Wins!`;
+          this.elements.modalSubtitle.textContent = 'The computer outsmarted you this time! Ready for a rematch?';
+        } else {
+          this.elements.modalIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+          this.elements.modalTitle.textContent = `${winnerName} Wins!`;
+          this.elements.modalSubtitle.textContent = 'Congratulations on the victory! Play another round to defend your title.';
+        }
+      } else {
+        // Tie
+        this.elements.modalIcon.innerHTML = '<i class="fa-solid fa-handshake"></i>';
+        this.elements.modalTitle.textContent = "It's a Tie!";
+        this.elements.modalSubtitle.textContent = 'A well-fought battle between evenly matched opponents!';
+      }
+
+      this.elements.resultModal.classList.remove('hidden');
+    },
+
+    showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>${message}</span>`;
+      
+      this.elements.toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px) scale(0.9)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
     }
-}
+  };
 
-displayBoard();
+  /* ==========================================================================
+     6. INITIALIZE APPLICATION ON DOM READY
+     ========================================================================== */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => UIController.init());
+  } else {
+    UIController.init();
+  }
+
+})();
