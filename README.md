@@ -5,7 +5,7 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)
 
-A state-of-the-art, feature-complete web implementation of **Tic Tac Toe** originally inspired by [The Odin Project](https://www.theodinproject.com/). Refactored with a sleek dark glassmorphic design system, interactive audio cues, modular architecture, and an **unbeatable Minimax AI**.
+A state-of-the-art, feature-complete web implementation of **Tic Tac Toe** originally inspired by [The Odin Project](https://www.theodinproject.com/). Refactored with a refined, warm mid-century artisanal design system, interactive audio cues, modular architecture, and an **unbeatable Minimax AI**.
 
 ---
 
@@ -17,9 +17,10 @@ A state-of-the-art, feature-complete web implementation of **Tic Tac Toe** origi
   - **Unbeatable (Minimax)**: Powered by the recursive Minimax algorithm with alpha-beta pruning. It evaluates every possible future game state to guarantee a win or force a tie!
 - **👥 Player vs Player Mode**
   - Pass-and-play local multiplayer with customizable player names and symbol selection (X or O).
-- **🎨 State-of-the-Art Glassmorphic UI**
-  - Rich midnight dark theme (`#090d16`) styled with backdrop blur panels, neon gradients, and dynamic floating background glow orbs.
-  - Smooth micro-animations for cell marking, turn indicators, winning line highlights, and celebratory end-game modals.
+- **🎨 Warm Mid-Century Artisanal UI**
+  - Refined espresso and cocoa palette styled with clean architectural panels, burnt terracotta and warm sage markers, and tactile natural shadows (no cyberpunk or neon glow!).
+  - Rigid, strictly consistent 3x3 grid geometry that maintains exact square dimensions regardless of content or state.
+  - Smooth micro-animations for cell marking, turn indicators, winning square highlights, and celebratory end-game modals.
 - **🔊 Audio Effects & Sound Management**
   - Custom audio feedback for marker placements, winning matches, defeat, tie games, and invalid moves.
   - Convenient mute/unmute toggle in the header that persists audio preferences across sessions via `localStorage`.
