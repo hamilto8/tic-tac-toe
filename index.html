@@ -3,55 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern, feature-complete, and responsive Tic Tac Toe web game featuring Player vs Player and unbeatable Minimax AI gameplay.">
+    <title>Tic Tac Toe — Modern Edition</title>
+    
+    <!-- Favicon -->
     <link rel="shortcut icon" href="./images/tictactoe.ico" type="image/x-icon">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-<link href="https://fonts.googleapis.com/css2?family=Londrina+Outline&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Londrina+Outline&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
-    <title>Tic Tac Toe</title>
 </head>
 <body>
-    <div class="header">
-        <img src="./images/tictactoe.gif" id="tic-tac-logo" alt="tic-tac-toe">
-        <h1>Tic Tac Toe</h1>
-        <h4>The Gentleman's Game</h4> 
-        <button class="sound"><i class="fas fa-volume-up"></i></button>
+    <div class="background-effects" aria-hidden="true">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
     </div>
-    <div class="container">
-        <div id="main"></div>
-        <div class="chooseChar">
-            Please Select Game Options
-            <button class="okayButton">Got It.</button>
-        </div>
-        <button class="playAgain">Play Again?</button>
-        <div class='gameWon'> 
-            <h3>
-            The Game is Won 
-            </h3>
-        </div>
-        <div class='gameOver'>
-            <h3>Game Over :(</h3>
-        </div>
-        <div class="options">
-            <div class="makeChoice">
-                Choose Your Character
-                <button class="chooseX">Choose X</button>
-                <button class="chooseO">Choose O</button>
+
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="game-header">
+            <div class="logo-group" id="logo-button" role="button" tabindex="0" aria-label="Return to main menu">
+                <img src="./images/tictactoe.gif" alt="Tic Tac Toe Logo" class="logo-icon">
+                <div class="logo-text">
+                    <h1>Tic Tac Toe</h1>
+                    <span class="subtitle">Modern Edition</span>
+                </div>
             </div>
-            <div class="enter-name">
-                Enter Player Name
-                <input type="text" name="enter-name" placeholder="Enter Name Here">
+            
+            <div class="header-controls">
+                <button id="sound-toggle-btn" class="icon-btn" aria-label="Toggle Sound" title="Toggle Sound">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <button id="settings-btn" class="icon-btn hidden" aria-label="Game Settings" title="Game Settings">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
             </div>
-            <div class="choose-player-count">Choose Game Style
-                <button class="one-player">Player vs. Computer</button>
-                <button class="two-player">Player vs. Player</button>
-            </div>
-        </div>
-        <div class="takenSquare">That Square is taken!</div>
-        <div class="player-status"></div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="game-main">
+            <!-- SETUP SCREEN -->
+            <section id="setup-screen" class="screen card-glass active" aria-labelledby="setup-title">
+                <h2 id="setup-title" class="screen-title">Game Setup</h2>
+                
+                <!-- Game Mode Selector -->
+                <div class="form-group">
+                    <label class="section-label">Select Mode</label>
+                    <div class="mode-selector" role="radiogroup" aria-label="Game Mode">
+                        <button type="button" class="mode-btn active" data-mode="pvc" aria-checked="true" role="radio">
+                            <i class="fa-solid fa-robot"></i>
+                            <span>Player vs Computer</span>
+                        </button>
+                        <button type="button" class="mode-btn" data-mode="pvp" aria-checked="false" role="radio">
+                            <i class="fa-solid fa-user-group"></i>
+                            <span>Player vs Player</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Difficulty Selector (Visible only in PvC) -->
+                <div id="difficulty-group" class="form-group">
+                    <label class="section-label">AI Difficulty</label>
+                    <div class="difficulty-selector" role="radiogroup" aria-label="AI Difficulty">
+                        <button type="button" class="diff-btn" data-diff="easy" role="radio" aria-checked="false">Easy</button>
+                        <button type="button" class="diff-btn active" data-diff="medium" role="radio" aria-checked="true">Medium</button>
+                        <button type="button" class="diff-btn diff-hard" data-diff="hard" role="radio" aria-checked="false">
+                            <i class="fa-solid fa-fire"></i> Unbeatable
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Player 1 & Marker Selection -->
+                <div class="player-config-grid">
+                    <div class="player-input-card">
+                        <label for="player1-name" class="input-label">Player 1 Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user input-icon"></i>
+                            <input type="text" id="player1-name" placeholder="Player 1" maxlength="15" autocomplete="off" spellcheck="false">
+                        </div>
+                        
+                        <div class="marker-selection">
+                            <span class="marker-label">Choose Symbol:</span>
+                            <div class="marker-options" role="radiogroup" aria-label="Player 1 Symbol">
+                                <button type="button" class="marker-btn active marker-x" data-marker="X" role="radio" aria-checked="true">X</button>
+                                <button type="button" class="marker-btn marker-o" data-marker="O" role="radio" aria-checked="false">O</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Player 2 Configuration -->
+                    <div id="player2-config" class="player-input-card">
+                        <label for="player2-name" class="input-label" id="player2-label">Opponent Name</label>
+                        <div class="input-wrapper">
+                            <i id="player2-icon" class="fa-solid fa-robot input-icon"></i>
+                            <input type="text" id="player2-name" placeholder="Computer" maxlength="15" autocomplete="off" spellcheck="false" disabled>
+                        </div>
+                        <div class="marker-display">
+                            <span class="marker-label">Symbol:</span>
+                            <span id="player2-marker-preview" class="marker-badge marker-o">O</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="start-game-btn" class="btn-primary pulse-hover">
+                    <span>Start Game</span>
+                    <i class="fa-solid fa-play"></i>
+                </button>
+            </section>
+
+            <!-- GAME PLAY SCREEN -->
+            <section id="game-screen" class="screen hidden" aria-label="Tic Tac Toe Game Board">
+                <!-- Scoreboard -->
+                <div class="scoreboard card-glass">
+                    <div id="score-card-p1" class="score-card p1-card active-turn">
+                        <div class="score-info">
+                            <span id="p1-name-display" class="player-name">Player 1</span>
+                            <span id="p1-marker-display" class="symbol-badge marker-x">X</span>
+                        </div>
+                        <div class="score-number" id="p1-score">0</div>
+                    </div>
+                    
+                    <div class="score-card ties-card">
+                        <span class="ties-label">Ties</span>
+                        <div class="score-number" id="ties-score">0</div>
+                    </div>
+                    
+                    <div id="score-card-p2" class="score-card p2-card">
+                        <div class="score-info">
+                            <span id="p2-name-display" class="player-name">Computer</span>
+                            <span id="p2-marker-display" class="symbol-badge marker-o">O</span>
+                        </div>
+                        <div class="score-number" id="p2-score">0</div>
+                    </div>
+                </div>
+
+                <!-- Turn Indicator Banner -->
+                <div class="turn-indicator-wrapper">
+                    <div id="turn-indicator" class="turn-indicator card-glass">
+                        <span id="turn-text">Player 1's Turn</span>
+                        <span id="turn-symbol" class="symbol-badge marker-x">X</span>
+                    </div>
+                </div>
+
+                <!-- 3x3 Game Board -->
+                <div class="board-container">
+                    <div id="game-board" class="game-board" role="grid" aria-label="Game board">
+                        <button class="cell" data-index="0" role="gridcell" aria-label="Cell 0, empty"></button>
+                        <button class="cell" data-index="1" role="gridcell" aria-label="Cell 1, empty"></button>
+                        <button class="cell" data-index="2" role="gridcell" aria-label="Cell 2, empty"></button>
+                        <button class="cell" data-index="3" role="gridcell" aria-label="Cell 3, empty"></button>
+                        <button class="cell" data-index="4" role="gridcell" aria-label="Cell 4, empty"></button>
+                        <button class="cell" data-index="5" role="gridcell" aria-label="Cell 5, empty"></button>
+                        <button class="cell" data-index="6" role="gridcell" aria-label="Cell 6, empty"></button>
+                        <button class="cell" data-index="7" role="gridcell" aria-label="Cell 7, empty"></button>
+                        <button class="cell" data-index="8" role="gridcell" aria-label="Cell 8, empty"></button>
+                    </div>
+                </div>
+
+                <!-- Game Screen Footer Controls -->
+                <div class="game-actions">
+                    <button id="reset-round-btn" class="btn-secondary">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Reset Round</span>
+                    </button>
+                    <button id="new-game-btn" class="btn-secondary">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Change Mode</span>
+                    </button>
+                </div>
+            </section>
+        </main>
     </div>
+
+    <!-- End Game Result Modal -->
+    <div id="result-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content card-glass">
+            <div id="modal-icon" class="modal-icon-wrapper">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 id="modal-title" class="modal-title">Player 1 Wins!</h2>
+            <p id="modal-subtitle" class="modal-subtitle">Great match! Would you like to play another round?</p>
+            
+            <div class="modal-actions">
+                <button id="play-again-btn" class="btn-primary">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Next Round</span>
+                </button>
+                <button id="modal-settings-btn" class="btn-secondary">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <!-- Game Script -->
     <script src="script.js"></script>
 </body>
 </html>
