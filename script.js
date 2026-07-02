@@ -66,11 +66,11 @@
      ========================================================================== */
   const Gameboard = {
     board: Array(9).fill(null),
-    winningCombos: [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-      [0, 4, 8], [2, 4, 6]              // Diagonals
-    ],
+    winningCombos: Object.freeze([
+      Object.freeze([0, 1, 2]), Object.freeze([3, 4, 5]), Object.freeze([6, 7, 8]), // Rows
+      Object.freeze([0, 3, 6]), Object.freeze([1, 4, 7]), Object.freeze([2, 5, 8]), // Columns
+      Object.freeze([0, 4, 8]), Object.freeze([2, 4, 6])                            // Diagonals
+    ]),
 
     reset() {
       this.board = Array(9).fill(null);
@@ -126,31 +126,33 @@
   const AIController = {
     /**
      * Determines the AI's move based on selected difficulty.
-     * @param {Array} board - Current board array.
+     * Operates on a defensive copy of the board to avoid mutating game state.
+     * @param {Array} board - Current board array (will NOT be mutated).
      * @param {string} aiMarker - AI's symbol ('X' or 'O').
      * @param {string} humanMarker - Human's symbol ('X' or 'O').
      * @param {string} difficulty - 'easy', 'medium', or 'hard'.
-     * @returns {number} - The chosen cell index (0-8).
+     * @returns {number} - The chosen cell index (0-8), or -1 if board is full.
      */
     getMove(board, aiMarker, humanMarker, difficulty) {
-      const emptyIndices = Gameboard.getEmptyIndices(board);
+      const boardCopy = [...board];
+      const emptyIndices = Gameboard.getEmptyIndices(boardCopy);
       if (emptyIndices.length === 0) return -1;
 
       if (difficulty === 'easy') {
-        return this.getEasyMove(emptyIndices);
+        return this._getEasyMove(emptyIndices);
       } else if (difficulty === 'medium') {
-        return this.getMediumMove(board, emptyIndices, aiMarker, humanMarker);
+        return this._getMediumMove(boardCopy, emptyIndices, aiMarker, humanMarker);
       } else {
-        return this.getHardMove(board, aiMarker, humanMarker);
+        return this._getHardMove(boardCopy, aiMarker, humanMarker);
       }
     },
 
-    getEasyMove(emptyIndices) {
+    _getEasyMove(emptyIndices) {
       const randomIndex = Math.floor(Math.random() * emptyIndices.length);
       return emptyIndices[randomIndex];
     },
 
-    getMediumMove(board, emptyIndices, aiMarker, humanMarker) {
+    _getMediumMove(board, emptyIndices, aiMarker, humanMarker) {
       // 1. Check if AI can win in 1 move
       for (const idx of emptyIndices) {
         const boardCopy = [...board];
@@ -169,19 +171,21 @@
       if (board[4] === null) return 4;
 
       // 4. Otherwise, random move from remaining empty cells
-      return this.getEasyMove(emptyIndices);
+      return this._getEasyMove(emptyIndices);
     },
 
-    getHardMove(board, aiMarker, humanMarker) {
-      // Unbeatable Minimax Algorithm
-      const bestMove = this.minimax(board, 0, true, -Infinity, Infinity, aiMarker, humanMarker);
+    _getHardMove(board, aiMarker, humanMarker) {
+      // Unbeatable Minimax Algorithm (operates on a copy — safe to mutate)
+      const bestMove = this._minimax(board, 0, true, -Infinity, Infinity, aiMarker, humanMarker);
       return bestMove.index;
     },
 
     /**
      * Recursive Minimax with Alpha-Beta Pruning.
+     * Mutates the passed board array in-place during recursion (caller must
+     * pass a defensive copy so the canonical Gameboard.board is never touched).
      */
-    minimax(board, depth, isMaximizing, alpha, beta, aiMarker, humanMarker) {
+    _minimax(board, depth, isMaximizing, alpha, beta, aiMarker, humanMarker) {
       const winResult = Gameboard.checkWin(board);
       if (winResult !== null) {
         // If AI wins, return high score minus depth (prefer faster wins)
@@ -202,7 +206,7 @@
 
         for (const idx of emptyIndices) {
           board[idx] = aiMarker;
-          const result = this.minimax(board, depth + 1, false, alpha, beta, aiMarker, humanMarker);
+          const result = this._minimax(board, depth + 1, false, alpha, beta, aiMarker, humanMarker);
           board[idx] = null; // Backtrack
 
           if (result.score > maxScore) {
@@ -219,7 +223,7 @@
 
         for (const idx of emptyIndices) {
           board[idx] = humanMarker;
-          const result = this.minimax(board, depth + 1, true, alpha, beta, aiMarker, humanMarker);
+          const result = this._minimax(board, depth + 1, true, alpha, beta, aiMarker, humanMarker);
           board[idx] = null; // Backtrack
 
           if (result.score < minScore) {
@@ -249,7 +253,11 @@
       isAiThinking: false
     },
 
+    /** @type {number|null} Active AI timeout ID, used to cancel on navigation */
+    _aiTimeoutId: null,
+
     initGame(config) {
+      this._clearAiTimeout();
       this.state.mode = config.mode;
       this.state.difficulty = config.difficulty;
       
@@ -276,6 +284,7 @@
     },
 
     startRound() {
+      this._clearAiTimeout();
       Gameboard.reset();
       this.state.isPlaying = true;
       this.state.isAiThinking = false;
@@ -293,12 +302,26 @@
       }
     },
 
+    /**
+     * Cancels any pending AI timeout to prevent stale callbacks
+     * firing after the user navigates away from the game screen.
+     */
+    _clearAiTimeout() {
+      if (this._aiTimeoutId !== null) {
+        clearTimeout(this._aiTimeoutId);
+        this._aiTimeoutId = null;
+      }
+    },
+
     getCurrentPlayer() {
       return this.state.currentTurn === 1 ? this.state.player1 : this.state.player2;
     },
 
     handleCellClick(index) {
       if (!this.state.isPlaying || this.state.isAiThinking) return;
+
+      // In PvC mode, only allow clicks when it's the human's turn
+      if (this.state.player2.isAi && this.state.currentTurn === 2) return;
 
       const cellContent = Gameboard.getCell(index);
       if (cellContent !== null) {
@@ -347,7 +370,9 @@
       UIController.setBoardDisabled(true);
 
       // Add a slight natural delay for AI thinking
-      setTimeout(() => {
+      this._aiTimeoutId = setTimeout(() => {
+        this._aiTimeoutId = null;
+
         if (!this.state.isPlaying) return;
 
         const aiMove = AIController.getMove(
@@ -367,6 +392,7 @@
     },
 
     handleGameOver(winResult) {
+      this._clearAiTimeout();
       this.state.isPlaying = false;
       this.state.isAiThinking = false;
       UIController.setBoardDisabled(true);
@@ -406,12 +432,31 @@
           UIController.showResultModal({ type: 'tie' });
         }, 500);
       }
+    },
+
+    /** Called by UIController when navigating away from the game screen */
+    stopGame() {
+      this._clearAiTimeout();
+      this.state.isPlaying = false;
+      this.state.isAiThinking = false;
     }
   };
 
   /* ==========================================================================
      5. UI CONTROLLER (DOM Manipulation & Events)
      ========================================================================== */
+
+  /**
+   * Creates a FontAwesome icon element without innerHTML.
+   * @param {string} iconClass - Space-separated FA class string, e.g. 'fa-solid fa-trophy'
+   * @returns {HTMLElement}
+   */
+  function createIcon(iconClass) {
+    const icon = document.createElement('i');
+    icon.className = iconClass;
+    return icon;
+  }
+
   const UIController = {
     elements: {
       setupScreen: document.getElementById('setup-screen'),
@@ -488,7 +533,7 @@
 
       // Setup Screen Controls
       this.elements.modeBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
           SoundManager.play('click');
           const mode = btn.dataset.mode;
           this.setMode(mode);
@@ -520,10 +565,20 @@
         this.handleStartGame();
       });
 
-      // Board Clicks
+      // Board Clicks (delegated)
       this.elements.gameBoard.addEventListener('click', (e) => {
         const cell = e.target.closest('.cell');
         if (!cell) return;
+        const index = parseInt(cell.dataset.index, 10);
+        GameEngine.handleCellClick(index);
+      });
+
+      // Board Keyboard Support (delegated)
+      this.elements.gameBoard.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        const cell = e.target.closest('.cell');
+        if (!cell) return;
+        e.preventDefault();
         const index = parseInt(cell.dataset.index, 10);
         GameEngine.handleCellClick(index);
       });
@@ -626,6 +681,8 @@
     },
 
     showSetupScreen() {
+      GameEngine.stopGame();
+
       this.elements.gameScreen.classList.remove('active');
       this.elements.gameScreen.classList.add('hidden');
       this.elements.resultModal.classList.add('hidden');
@@ -713,7 +770,7 @@
       this.elements.turnSymbol.textContent = currentPlayer.marker;
       this.elements.turnSymbol.className = `symbol-badge marker-${markerLower}`;
 
-      // Update active card glow
+      // Update active card highlight
       const isP1Turn = GameEngine.state.currentTurn === 1;
       this.elements.p1ScoreCard.classList.toggle('active-turn', isP1Turn);
       this.elements.p2ScoreCard.classList.toggle('active-turn', !isP1Turn);
@@ -728,24 +785,27 @@
     },
 
     showResultModal({ type, winnerName, winnerMarker, isAiWin }) {
-      this.elements.modalIcon.className = 'modal-icon-wrapper';
+      // Clear previous icon content (safe: no innerHTML)
+      const iconWrapper = this.elements.modalIcon;
+      iconWrapper.className = 'modal-icon-wrapper';
+      iconWrapper.textContent = '';
       
       if (type === 'win') {
         const markerLower = winnerMarker.toLowerCase();
-        this.elements.modalIcon.classList.add(`win-${markerLower}`);
+        iconWrapper.classList.add(`win-${markerLower}`);
         
         if (isAiWin) {
-          this.elements.modalIcon.innerHTML = '<i class="fa-solid fa-robot"></i>';
+          iconWrapper.appendChild(createIcon('fa-solid fa-robot'));
           this.elements.modalTitle.textContent = `${winnerName} Wins!`;
           this.elements.modalSubtitle.textContent = 'The computer outsmarted you this time! Ready for a rematch?';
         } else {
-          this.elements.modalIcon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+          iconWrapper.appendChild(createIcon('fa-solid fa-trophy'));
           this.elements.modalTitle.textContent = `${winnerName} Wins!`;
           this.elements.modalSubtitle.textContent = 'Congratulations on the victory! Play another round to defend your title.';
         }
       } else {
         // Tie
-        this.elements.modalIcon.innerHTML = '<i class="fa-solid fa-handshake"></i>';
+        iconWrapper.appendChild(createIcon('fa-solid fa-handshake'));
         this.elements.modalTitle.textContent = "It's a Tie!";
         this.elements.modalSubtitle.textContent = 'A well-fought battle between evenly matched opponents!';
       }
@@ -756,7 +816,13 @@
     showToast(message) {
       const toast = document.createElement('div');
       toast.className = 'toast';
-      toast.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i><span>${message}</span>`;
+
+      const icon = createIcon('fa-solid fa-circle-exclamation');
+      const span = document.createElement('span');
+      span.textContent = message;
+
+      toast.appendChild(icon);
+      toast.appendChild(span);
       
       this.elements.toastContainer.appendChild(toast);
 

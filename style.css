@@ -407,10 +407,6 @@ html, body {
   transform: translateY(0);
 }
 
-.pulse-hover:hover {
-  animation: none; /* Removed pulse animation for clean architectural feel */
-}
-
 .btn-secondary {
   padding: 0.75rem 1.25rem;
   border-radius: 12px;
@@ -600,23 +596,35 @@ html, body {
   transform: scale(0.98);
 }
 
+.cell:focus-visible {
+  outline: 2px solid var(--color-x);
+  outline-offset: -2px;
+}
+
 .cell:active:not(.taken):not(.disabled) {
   transform: scale(0.94);
 }
 
 /* Hover symbol preview */
+.cell.preview-x:hover:not(.taken):not(.disabled)::after,
+.cell.preview-o:hover:not(.taken):not(.disabled)::after {
+  font-family: var(--font-marker);
+  font-size: inherit;
+  font-weight: inherit;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .cell.preview-x:hover:not(.taken):not(.disabled)::after {
   content: 'X';
   color: rgba(209, 92, 56, 0.25);
-  font-family: var(--font-marker);
-  position: absolute;
 }
 
 .cell.preview-o:hover:not(.taken):not(.disabled)::after {
   content: 'O';
   color: rgba(108, 148, 95, 0.25);
-  font-family: var(--font-marker);
-  position: absolute;
 }
 
 .cell.marked-x {
@@ -635,11 +643,11 @@ html, body {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Winning Cell Highlight (Solid mustard gold elevation, NO cyberpunk glow) */
+/* Winning Cell Highlight — preserves marker color, highlights the border & background */
 .cell.winning-cell {
   background: #332d20;
   border-color: var(--color-tie);
-  color: var(--color-tie);
+  /* color is NOT overridden — X stays terracotta, O stays sage */
   box-shadow: 0 6px 18px rgba(219, 157, 50, 0.25);
   transform: scale(1.02);
   z-index: 2;

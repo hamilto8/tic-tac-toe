@@ -76,7 +76,7 @@ The codebase is engineered following strict modularity and separation of concern
 
 ```
 ├── index.html     # Semantic markup, accessibility roles, UI containers & modals
-├── style.css      # Design tokens, glassmorphism utilities, animations & media queries
+├── style.css      # Design tokens, warm panel system, animations & media queries
 ├── script.js      # IIFE encapsulated modular engine
 ├── images/        # Favicons & brand logos
 └── sound/         # Audio effects (mp3 format)
