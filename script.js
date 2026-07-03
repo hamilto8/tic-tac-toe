@@ -606,15 +606,6 @@
         this.elements.resultModal.classList.add('hidden');
         this.showSetupScreen();
       });
-
-      // Keyboard Accessibility for Logo
-      this.elements.logoBtn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          SoundManager.play('click');
-          this.showSetupScreen();
-        }
-      });
     },
 
     updateSoundIcon() {

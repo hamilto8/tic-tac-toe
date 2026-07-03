@@ -24,19 +24,19 @@
     <div class="app-container">
         <!-- Top Navigation / Header -->
         <header class="game-header">
-            <div class="logo-group" id="logo-button" role="button" tabindex="0" aria-label="Return to main menu">
+            <button type="button" class="logo-group" id="logo-button" aria-label="Return to main menu">
                 <img src="./images/tictactoe.gif" alt="Tic Tac Toe Logo" class="logo-icon">
                 <div class="logo-text">
                     <h1>Tic Tac Toe</h1>
                     <span class="subtitle">Modern Edition</span>
                 </div>
-            </div>
+            </button>
             
             <div class="header-controls">
-                <button id="sound-toggle-btn" class="icon-btn" aria-label="Toggle Sound" title="Toggle Sound">
+                <button type="button" id="sound-toggle-btn" class="icon-btn" aria-label="Toggle Sound" title="Toggle Sound">
                     <i class="fa-solid fa-volume-high"></i>
                 </button>
-                <button id="settings-btn" class="icon-btn hidden" aria-label="Game Settings" title="Game Settings">
+                <button type="button" id="settings-btn" class="icon-btn hidden" aria-label="Game Settings" title="Game Settings">
                     <i class="fa-solid fa-gear"></i>
                 </button>
             </div>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
 
-                <button id="start-game-btn" class="btn-primary">
+                <button type="button" id="start-game-btn" class="btn-primary">
                     <span>Start Game</span>
                     <i class="fa-solid fa-play"></i>
                 </button>
@@ -150,25 +150,25 @@
                 <!-- 3x3 Game Board -->
                 <div class="board-container">
                     <div id="game-board" class="game-board" role="grid" aria-label="Game board">
-                        <button class="cell" data-index="0" role="gridcell" aria-label="Cell 0, empty"></button>
-                        <button class="cell" data-index="1" role="gridcell" aria-label="Cell 1, empty"></button>
-                        <button class="cell" data-index="2" role="gridcell" aria-label="Cell 2, empty"></button>
-                        <button class="cell" data-index="3" role="gridcell" aria-label="Cell 3, empty"></button>
-                        <button class="cell" data-index="4" role="gridcell" aria-label="Cell 4, empty"></button>
-                        <button class="cell" data-index="5" role="gridcell" aria-label="Cell 5, empty"></button>
-                        <button class="cell" data-index="6" role="gridcell" aria-label="Cell 6, empty"></button>
-                        <button class="cell" data-index="7" role="gridcell" aria-label="Cell 7, empty"></button>
-                        <button class="cell" data-index="8" role="gridcell" aria-label="Cell 8, empty"></button>
+                        <button type="button" class="cell" data-index="0" role="gridcell" aria-label="Cell 0, empty"></button>
+                        <button type="button" class="cell" data-index="1" role="gridcell" aria-label="Cell 1, empty"></button>
+                        <button type="button" class="cell" data-index="2" role="gridcell" aria-label="Cell 2, empty"></button>
+                        <button type="button" class="cell" data-index="3" role="gridcell" aria-label="Cell 3, empty"></button>
+                        <button type="button" class="cell" data-index="4" role="gridcell" aria-label="Cell 4, empty"></button>
+                        <button type="button" class="cell" data-index="5" role="gridcell" aria-label="Cell 5, empty"></button>
+                        <button type="button" class="cell" data-index="6" role="gridcell" aria-label="Cell 6, empty"></button>
+                        <button type="button" class="cell" data-index="7" role="gridcell" aria-label="Cell 7, empty"></button>
+                        <button type="button" class="cell" data-index="8" role="gridcell" aria-label="Cell 8, empty"></button>
                     </div>
                 </div>
 
                 <!-- Game Screen Footer Controls -->
                 <div class="game-actions">
-                    <button id="reset-round-btn" class="btn-secondary">
+                    <button type="button" id="reset-round-btn" class="btn-secondary">
                         <i class="fa-solid fa-rotate-right"></i>
                         <span>Reset Round</span>
                     </button>
-                    <button id="new-game-btn" class="btn-secondary">
+                    <button type="button" id="new-game-btn" class="btn-secondary">
                         <i class="fa-solid fa-gear"></i>
                         <span>Change Mode</span>
                     </button>
@@ -187,11 +187,11 @@
             <p id="modal-subtitle" class="modal-subtitle">Great match! Would you like to play another round?</p>
             
             <div class="modal-actions">
-                <button id="play-again-btn" class="btn-primary">
+                <button type="button" id="play-again-btn" class="btn-primary">
                     <i class="fa-solid fa-rotate-right"></i>
                     <span>Next Round</span>
                 </button>
-                <button id="modal-settings-btn" class="btn-secondary">
+                <button type="button" id="modal-settings-btn" class="btn-secondary">
                     <i class="fa-solid fa-sliders"></i>
                     <span>Menu</span>
                 </button>
