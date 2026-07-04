@@ -463,7 +463,6 @@
       gameScreen: document.getElementById('game-screen'),
       logoBtn: document.getElementById('logo-button'),
       soundToggleBtn: document.getElementById('sound-toggle-btn'),
-      settingsBtn: document.getElementById('settings-btn'),
       
       // Setup elements
       modeBtns: document.querySelectorAll('.mode-btn'),
@@ -522,11 +521,6 @@
       });
 
       this.elements.logoBtn.addEventListener('click', () => {
-        SoundManager.play('click');
-        this.showSetupScreen();
-      });
-
-      this.elements.settingsBtn.addEventListener('click', () => {
         SoundManager.play('click');
         this.showSetupScreen();
       });
@@ -680,8 +674,6 @@
       
       this.elements.setupScreen.classList.remove('hidden');
       this.elements.setupScreen.classList.add('active');
-      
-      this.elements.settingsBtn.classList.add('hidden');
     },
 
     showGameScreen() {
@@ -690,8 +682,6 @@
       
       this.elements.gameScreen.classList.remove('hidden');
       this.elements.gameScreen.classList.add('active');
-      
-      this.elements.settingsBtn.classList.remove('hidden');
     },
 
     renderBoard() {
