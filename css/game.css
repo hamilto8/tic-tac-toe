@@ -1,0 +1,237 @@
+/* ==========================================================================
+   Game Screen — Scoreboard, Turn Indicator, 3x3 Board & Actions
+   ========================================================================== */
+
+/* --- Game Screen --- */
+.scoreboard {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 14px;
+  background: #1a1715;
+  border: 1px solid var(--panel-border);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-card.active-turn {
+  background: #23201d;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.score-card.p1-card.active-turn {
+  border-color: var(--color-x);
+}
+
+.score-card.p2-card.active-turn {
+  border-color: var(--color-o);
+}
+
+.score-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  max-width: 100%;
+}
+
+.player-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+
+.symbol-badge, .marker-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-family: var(--font-marker);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.marker-x { color: var(--color-x); background: var(--color-x-bg); border: 1px solid var(--color-x-border); }
+.marker-o { color: var(--color-o); background: var(--color-o-bg); border: 1px solid var(--color-o-border); }
+
+.score-number {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.ties-card {
+  background: transparent;
+  border: none;
+}
+
+.ties-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+/* Turn Indicator */
+.turn-indicator-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.turn-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: #1e1b18;
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- 3x3 Game Board (STRICT EQUAL BOX SIZING) --- */
+.board-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr); /* CRITICAL: Forces all 3 rows to have identical height! */
+  gap: 12px;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 1 / 1;
+  background: #1a1715;
+  padding: 12px;
+  border-radius: 20px;
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--shadow-md), inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.cell {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1; /* Double protection against sizing collapse */
+  background: #25221f;
+  border: 1px solid #36322e;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-marker);
+  font-size: 3.6rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.cell:hover:not(.taken):not(.disabled) {
+  background: #2e2a26;
+  border-color: #4a453f;
+  transform: scale(0.98);
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--color-x);
+  outline-offset: -2px;
+}
+
+.cell:active:not(.taken):not(.disabled) {
+  transform: scale(0.94);
+}
+
+/* Hover symbol preview */
+.cell.preview-x:hover:not(.taken):not(.disabled)::after,
+.cell.preview-o:hover:not(.taken):not(.disabled)::after {
+  font-family: var(--font-marker);
+  font-size: inherit;
+  font-weight: inherit;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.cell.preview-x:hover:not(.taken):not(.disabled)::after {
+  content: 'X';
+  color: rgba(209, 92, 56, 0.25);
+}
+
+.cell.preview-o:hover:not(.taken):not(.disabled)::after {
+  content: 'O';
+  color: rgba(108, 148, 95, 0.25);
+}
+
+.cell.marked-x {
+  color: var(--color-x);
+  animation: popIn var(--transition-bounce);
+}
+
+.cell.marked-o {
+  color: var(--color-o);
+  animation: popIn var(--transition-bounce);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.4); opacity: 0; }
+  75% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Winning Cell Highlight — preserves marker color, highlights the border & background */
+.cell.winning-cell {
+  background: #332d20;
+  border-color: var(--color-tie);
+  /* color is NOT overridden — X stays terracotta, O stays sage */
+  box-shadow: 0 6px 18px rgba(219, 157, 50, 0.25);
+  transform: scale(1.02);
+  z-index: 2;
+}
+
+.cell.disabled {
+  cursor: default;
+}
+
+/* --- Game Actions --- */
+.game-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}

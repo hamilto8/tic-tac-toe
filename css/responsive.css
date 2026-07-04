@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Responsive Media Queries & Reduced Motion Support
+   ========================================================================== */
+
+/* --- Responsive Media Queries --- */
+@media (max-width: 640px) {
+  .app-container {
+    padding: 1rem;
+  }
+  
+  .card-glass {
+    padding: 1.25rem;
+  }
+  
+  .player-config-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .scoreboard {
+    grid-template-columns: 1fr 70px 1fr;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+  
+  .score-number {
+    font-size: 1.35rem;
+  }
+  
+  .game-board {
+    max-width: 330px;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .cell {
+    font-size: 3rem;
+    border-radius: 10px;
+  }
+  
+  .mode-btn, .diff-btn {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.82rem;
+  }
+}
+
+/* --- Reduced Motion Support --- */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

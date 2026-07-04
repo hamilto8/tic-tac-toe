@@ -1,0 +1,116 @@
+/* ==========================================================================
+   Modals & Toast Notifications — Overlays and Feedback Elements
+   ========================================================================== */
+
+/* --- End Game Modal --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(18, 16, 14, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  transition: opacity 0.25s ease;
+}
+
+.modal-content {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  animation: modalSlideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: #24211e;
+  border: 1px solid var(--panel-border-active);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+}
+
+@keyframes modalSlideUp {
+  0% { transform: translateY(30px) scale(0.93); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-icon-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: var(--color-tie-bg);
+  border: 1px solid var(--color-tie-border);
+  color: var(--color-tie);
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem auto;
+}
+
+.modal-icon-wrapper.win-x {
+  background: var(--color-x-bg);
+  border-color: var(--color-x-border);
+  color: var(--color-x);
+}
+
+.modal-icon-wrapper.win-o {
+  background: var(--color-o-bg);
+  border-color: var(--color-o-border);
+  color: var(--color-o);
+}
+
+.modal-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.modal-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.75rem;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* --- Toast Notification --- */
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toast {
+  background: #c94a38;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: toastFadeIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes toastFadeIn {
+  0% { transform: translateY(15px) scale(0.9); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}

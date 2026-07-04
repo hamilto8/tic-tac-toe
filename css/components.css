@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Reusable UI Components — Buttons & Action Elements
+   ========================================================================== */
+
+/* --- Buttons --- */
+.btn-primary {
+  width: 100%;
+  padding: 0.95rem 1.5rem;
+  border-radius: 14px;
+  border: none;
+  background: var(--color-x);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  box-shadow: 0 6px 16px rgba(209, 92, 56, 0.3);
+  transition: all var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background: #de6640;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(209, 92, 56, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  background: #2b2723;
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: #34302b;
+  border-color: var(--panel-border-active);
+  transform: translateY(-1px);
+}

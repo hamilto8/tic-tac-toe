@@ -1,0 +1,136 @@
+/* ==========================================================================
+   App Layout, Header, Card Utility & Screen Transitions
+   ========================================================================== */
+
+/* --- App Layout --- */
+.app-container {
+  position: relative;
+  z-index: 10;
+  max-width: 680px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Header --- */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0.85rem 1.25rem;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--transition-fast);
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+}
+
+.logo-group:hover {
+  transform: scale(1.015);
+}
+
+.logo-group:focus-visible {
+  outline: 2px solid var(--color-x);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--panel-border);
+}
+
+.logo-text h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.logo-text .subtitle {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-x);
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #1e1b18;
+  border: 1px solid var(--panel-border);
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background: var(--panel-bg-hover);
+  border-color: var(--panel-border-active);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.icon-btn:active {
+  transform: translateY(0);
+}
+
+/* --- Card Utility --- */
+.card-glass {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  padding: 2rem;
+}
+
+/* --- Screen Transitions --- */
+.screen {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  width: 100%;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* General Utility Classes */
+.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

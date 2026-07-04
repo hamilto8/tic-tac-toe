@@ -81,7 +81,15 @@ The codebase is engineered following strict modularity and clean separation of c
 
 ```
 ├── index.html     # Semantic markup, accessibility roles, UI containers & modals
-├── style.css      # Design tokens, warm panel system, animations & media queries
+├── style.css      # CSS entry point using @import for modular styling
+├── css/           # Modular CSS architecture
+│   ├── variables.css   # Color palette tokens, typography & CSS reset
+│   ├── layout.css      # App container, header, card glass & utility classes
+│   ├── components.css  # Primary and secondary button styles & hover states
+│   ├── setup.css       # Game setup screen, difficulty selector & name inputs
+│   ├── game.css        # Scoreboard, turn indicator, 3x3 grid & cell animations
+│   ├── modals.css      # End game result modal & toast notification animations
+│   └── responsive.css  # Mobile media queries & reduced motion accessibility
 ├── script.js      # Application entry point module
 ├── js/            # Modular ES6 architecture
 │   ├── sound.js   # Audio loading, playback & localStorage mute persistence
@@ -93,13 +101,22 @@ The codebase is engineered following strict modularity and clean separation of c
 └── sound/         # Audio effects (mp3 format)
 ```
 
-### ES6 Module Organization
+### ES6 Module Organization (`js/`)
 - `js/sound.js` (`SoundManager`): Handles audio playback, browser autoplay error handling, and localStorage state persistence.
 - `js/board.js` (`Gameboard`): Encapsulates cell validation, empty square queries, and static winning combination evaluation.
 - `js/ai.js` (`AIController`): Implements defensive board copies and decision logic for all AI difficulties.
 - `js/engine.js` (`GameEngine`): Coordinates game rules, turn switching, AI triggering, round resets, and score tallying.
 - `js/ui.js` (`UIController`): Manages DOM element caching, delegated event listeners, XSS-safe text rendering, toast alerts, and modals.
 - `script.js`: Clean application entry point that initializes `UIController` upon DOM readiness.
+
+### CSS Module Organization (`css/`)
+- `css/variables.css`: Defines the artisanal warm palette, typography fonts, shadows, transition variables, and standard CSS reset.
+- `css/layout.css`: Styles the primary `.app-container`, navigation header, branding logo, card utilities, and universal `.hidden` state.
+- `css/components.css`: Reusable UI button primitives (`.btn-primary`, `.btn-secondary`, `.icon-btn`) and active/hover states.
+- `css/setup.css`: Game setup controls, mode/difficulty segmented buttons, custom text input fields, and marker options.
+- `css/game.css`: Scoreboard cards, turn indicator badges, equal-box 3x3 `.game-board`, `.cell` hover previews, and win animations.
+- `css/modals.css`: End-game victory/tie modal overlays, icon badges, and toast notification alerts.
+- `css/responsive.css`: Media queries for mobile responsiveness (`max-width: 640px`) and accessibility support (`prefers-reduced-motion: reduce`).
 
 ---
 

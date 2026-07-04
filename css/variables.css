@@ -1,0 +1,64 @@
+/* ==========================================================================
+   CSS Reset & Variables — Warm Artisanal Palette & Typography
+   ========================================================================== */
+
+:root {
+  /* Color Palette - Warm Mid-Century Artisanal Lounge */
+  --bg-dark: #161412;
+  --bg-gradient: radial-gradient(circle at 50% 30%, #262320 0%, #161412 100%);
+  
+  --panel-bg: #24211e;
+  --panel-bg-hover: #2d2925;
+  --panel-border: #38342f;
+  --panel-border-active: #4e4942;
+  
+  /* Accent & Marker Colors (No Blue, No Purple, No Cyberpunk) */
+  --color-x: #d15c38;         /* Burnt Terracotta / Rust Orange */
+  --color-x-bg: rgba(209, 92, 56, 0.15);
+  --color-x-border: rgba(209, 92, 56, 0.4);
+  
+  --color-o: #6c945f;         /* Warm Sage / Olive Green */
+  --color-o-bg: rgba(108, 148, 95, 0.15);
+  --color-o-border: rgba(108, 148, 95, 0.4);
+  
+  --color-tie: #db9d32;       /* Warm Mustard Ochre Gold */
+  --color-tie-bg: rgba(219, 157, 50, 0.15);
+  --color-tie-border: rgba(219, 157, 50, 0.4);
+  
+  /* Typography Colors */
+  --text-primary: #f4eee3;    /* Soft Ivory / Off-White */
+  --text-secondary: #a39c91;  /* Warm Sand / Muted Taupe */
+  --text-muted: #6e675f;
+  
+  /* Fonts */
+  --font-ui: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-marker: 'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif;
+  
+  /* Elevation Shadows (Soft natural drop shadows, NO neon glow) */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100%;
+  width: 100%;
+  font-family: var(--font-ui);
+  background: var(--bg-dark);
+  background-image: var(--bg-gradient);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  position: relative;
+  line-height: 1.5;
+}
