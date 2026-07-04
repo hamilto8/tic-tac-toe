@@ -52,7 +52,7 @@ A state-of-the-art, feature-complete web implementation of **Tic Tac Toe** origi
 
 ## 🚀 Getting Started
 
-No installation or build step is required! This application runs natively in any modern web browser.
+No bundling or compilation build step is required! This application runs natively in modern web browsers using ES6 Modules.
 
 ### 1. Clone the Repository
 ```bash
@@ -61,33 +61,45 @@ cd tic-tac-toe
 ```
 
 ### 2. Launch the Application
-- Simply double-click `index.html` to open it in your default web browser.
-- Or, if you use VS Code, install the **Live Server** extension and right-click `index.html` -> **Open with Live Server**.
-- Alternatively, start a local development server using Node.js:
+Because this project utilizes native ES6 Modules (`import` / `export`), web browsers require the files to be served over HTTP rather than direct file system access (`file://`) due to CORS security policies.
+
+- **Using Node.js (`serve`)**:
   ```bash
   npx serve .
   ```
+- **Using Python 3**:
+  ```bash
+  python3 -m http.server 8000
+  ```
+- **Using VS Code**: Install the **Live Server** extension, right-click `index.html`, and select **Open with Live Server**.
 
 ---
 
-## 🏗️ Technical Architecture & Clean Code
+## 🏗️ Technical Architecture & ES6 Modules
 
-The codebase is engineered following strict modularity and separation of concerns without relying on external frameworks:
+The codebase is engineered following strict modularity and clean separation of concerns using standard ES6 Modules:
 
 ```
 ├── index.html     # Semantic markup, accessibility roles, UI containers & modals
 ├── style.css      # Design tokens, warm panel system, animations & media queries
-├── script.js      # IIFE encapsulated modular engine
+├── script.js      # Application entry point module
+├── js/            # Modular ES6 architecture
+│   ├── sound.js   # Audio loading, playback & localStorage mute persistence
+│   ├── board.js   # Canonical 3x3 grid array, cell mutations & win evaluation
+│   ├── ai.js      # Easy, Medium, and Unbeatable (Minimax + Alpha-Beta) AI logic
+│   ├── engine.js  # Gameplay lifecycle, turn management & scorekeeping
+│   └── ui.js      # DOM manipulation, event delegation, modals & toast alerts
 ├── images/        # Favicons & brand logos
 └── sound/         # Audio effects (mp3 format)
 ```
 
-### JavaScript Modules (`script.js`)
-- `SoundManager`: Handles audio loading, browser autoplay policies, playback, and mute state persistence.
-- `Gameboard`: Encapsulates the 3x3 grid array, cell validation, empty square queries, and static winning combination checks.
-- `AIController`: Implements the decision logic for Easy, Medium, and Unbeatable (recursive Minimax) difficulties.
-- `GameEngine`: Coordinates game rules, turn switching, AI triggering, round resets, and score tallying.
-- `UIController`: Manages DOM manipulation, event listeners, XSS-safe text rendering, toast alerts, and modal popups.
+### ES6 Module Organization
+- `js/sound.js` (`SoundManager`): Handles audio playback, browser autoplay error handling, and localStorage state persistence.
+- `js/board.js` (`Gameboard`): Encapsulates cell validation, empty square queries, and static winning combination evaluation.
+- `js/ai.js` (`AIController`): Implements defensive board copies and decision logic for all AI difficulties.
+- `js/engine.js` (`GameEngine`): Coordinates game rules, turn switching, AI triggering, round resets, and score tallying.
+- `js/ui.js` (`UIController`): Manages DOM element caching, delegated event listeners, XSS-safe text rendering, toast alerts, and modals.
+- `script.js`: Clean application entry point that initializes `UIController` upon DOM readiness.
 
 ---
 
