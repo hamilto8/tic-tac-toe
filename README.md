@@ -29,8 +29,10 @@ A state-of-the-art, feature-complete web implementation of **Tic Tac Toe** origi
 - **📊 Real-Time Score Tracking**
   - Interactive top scoreboard keeping count of Player 1 victories, Opponent/AI victories, and Tie games across consecutive rounds.
 - **🛡️ Secure & Accurate Game Logic**
-  - Strict input sanitation and text rendering (`textContent`) to prevent Cross-Site Scripting (XSS).
+  - Strict input sanitation and text rendering (`textContent`) without any `innerHTML` usage to prevent Cross-Site Scripting (XSS).
+  - Configured with a rock-solid **Content Security Policy (CSP)** (`default-src 'self'`), anti-MIME sniffing headers (`nosniff`), strict referrer policies, and native dark mode declarations (`color-scheme: dark`) for 100% compliance with Chrome, Edge, and modern browser safety standards.
   - Robust validation preventing illegal moves, square hijacking, or clicks while the AI is computing.
+  - Protected against third-party cookie/storage blocking with error-resilient `try...catch` wrappers around `localStorage` and HTML5 Audio play promises.
 - **📱 Responsive & Accessible**
   - Seamlessly scales across desktop, tablet, and mobile screens.
   - Implements WAI-ARIA attributes, semantic HTML5 tags, keyboard navigation, and respects `@media (prefers-reduced-motion: reduce)`.
